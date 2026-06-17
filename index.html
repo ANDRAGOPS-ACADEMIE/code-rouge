@@ -8,6 +8,7 @@ header{display:flex;justify-content:space-between;align-items:center;border-bott
 .logo{font-weight:800;letter-spacing:1px}.logo span{color:var(--r)}
 .chrono{font-size:28px;font-weight:800;background:#000;padding:5px 14px;border-radius:8px;border:2px solid var(--r);font-variant-numeric:tabular-nums}
 .card{background:#1d1d1d;border:1px solid #333;border-radius:12px;padding:20px;margin-bottom:12px}
+.brand{display:block;height:120px;margin:0 auto 12px}
 h1{color:var(--r);font-size:26px;margin-bottom:8px}h2{font-size:19px;margin-bottom:8px}p{line-height:1.5;margin-bottom:9px;color:#ddd}
 .pitch{font-style:italic;border-left:4px solid var(--o);padding-left:12px;color:#f0e6c8}
 .tag{display:inline-block;background:var(--r);color:#fff;font-weight:700;padding:3px 11px;border-radius:20px;font-size:12px;margin-bottom:8px}
@@ -20,9 +21,20 @@ input{width:100%;padding:11px;border-radius:8px;border:1px solid #444;background
 .meta{display:flex;gap:16px;font-size:13px;color:#aaa;margin-top:6px}.bar{height:8px;background:#333;border-radius:6px;overflow:hidden;margin-top:8px}.bar>i{display:block;height:100%;background:var(--v);width:0}
 .verdict{text-align:center;padding:26px}.code{font-size:42px;font-weight:900}.reco{background:#241a1a;border:1px solid var(--r);border-radius:10px;padding:12px;margin-top:9px;text-align:left}.reco b{color:var(--o)}.hide{display:none}
 footer{text-align:center;color:#777;font-size:11px;margin-top:14px}
-</style></head><body><div class="app">
+#splash{position:fixed;inset:0;background:radial-gradient(circle at 50% 40%,#1a1a1a,#080808);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;text-align:center;transition:opacity .8s}
+#splash.out{opacity:0;pointer-events:none}
+#splash img{width:190px;max-width:55%;opacity:0;transform:scale(.7);animation:logoIn 1s .2s forwards}
+#splash .stitle{color:#fff;font-size:34px;font-weight:900;letter-spacing:3px;margin-top:18px;opacity:0;animation:fadeUp .7s 1s forwards}
+#splash .stitle b{color:var(--r)}
+#splash .stag{color:#cbb;color:#bbb;margin-top:6px;opacity:0;animation:fadeUp .7s 1.4s forwards}
+#splash .ring{margin-top:24px;width:56px;height:56px;border-radius:50%;border:4px solid var(--r);border-top-color:transparent;animation:spin 1s linear infinite;opacity:0;animation:spin 1s linear infinite,fadeUp .6s 1.7s forwards}
+#splash .skip{position:absolute;bottom:22px;color:#aaa;font-size:13px;background:none;border:1px solid #555;padding:8px 16px;border-radius:8px;cursor:pointer}
+@keyframes logoIn{to{opacity:1;transform:scale(1)}}@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}@keyframes spin{to{transform:rotate(360deg)}}
+</style></head><body>
+<div id="splash"><img src="logo.png" alt="ANDRAGOPS"><div class="stitle">CODE <b>ROUGE</b></div><div class="stag">Êtes-vous prêts à réagir ?</div><div class="ring"></div><button class="skip" onclick="hideSplash()">Passer ▶</button></div>
+<div class="app">
 <header><div class="logo">CODE <span>ROUGE</span> · ANDRAGOPS</div><div id="chrono" class="chrono">18:00</div></header>
-<div id="intro" class="card"><span class="tag">ESCAPE GAME SÉCURITÉ</span><h1>14h07 — Atelier B</h1>
+<div id="intro" class="card"><img class="brand" src="logo.png" alt="ANDRAGOPS Académie"><span class="tag">ESCAPE GAME SÉCURITÉ</span><h1>14h07 — Atelier B</h1>
 <p class="pitch">Une odeur de brûlé, un collègue au sol près d'une ligne sous tension, et l'alarme n'a pas encore sonné. Vous avez 18 minutes pour reprendre le contrôle… puis prouver vos réflexes de prévention.</p>
 <p><b>Règle :</b> trouvez les bonnes actions dans le bon ordre. On agit, pas de question de cours. Chaque erreur coûte 45 secondes.</p>
 <input id="equipe" placeholder="Nom de l'équipe ou service (ex: Atelier assemblage)">
@@ -34,6 +46,8 @@ footer{text-align:center;color:#777;font-size:11px;margin-top:14px}
 <div id="fin" class="card verdict hide"></div>
 <footer>ANDRAGOPS Académie · andragops-academie.fr · Outil d'accroche, non certifiant.</footer></div>
 <script>
+function hideSplash(){var s=document.getElementById('splash');if(s){s.classList.add('out');setTimeout(function(){s.style.display='none'},800)}}
+setTimeout(hideSplash,5200);
 var API="https://eumviuptmyzgftrqpape.supabase.co/functions/v1/coderouge";
 var ACTES=[
 {tag:"ACTE 1 — L'ALERTE",titre:"Un collègue au sol, une odeur de brûlé",desc:"Un opérateur est allongé près d'une ligne encore sous tension. Que fait l'équipe, et dans quel ordre ?",theme:"secours",b:["Supprimer le danger : couper et consigner la machine, baliser","Examiner la victime (conscience, respiration)","Faire alerter les secours (18/112) par une personne désignée","Appeler le SST le plus proche"],p:["Déplacer tout de suite la victime","Prendre une photo de la scène"]},
