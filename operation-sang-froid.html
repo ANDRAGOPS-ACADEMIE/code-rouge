@@ -3,7 +3,7 @@
 <title>OPÉRATION SANG-FROID — ANDRAGOPS</title>
 <style>
 :root{--r:#C01A1A;--v:#1f8a4c;--o:#e8b50a}*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Arial,sans-serif}
-body{background:#111;color:#eee;min-height:100vh;display:flex;justify-content:center;padding:16px}.app{width:100%;max-width:760px}
+body{background:#111;color:#eee;min-height:100vh;padding:16px}.app{width:100%;max-width:760px;margin:0 auto}
 header{display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid var(--r);padding-bottom:10px;margin-bottom:14px}
 .logo{font-weight:800;letter-spacing:1px;font-size:15px}.logo span{color:var(--r)}
 .hud{display:flex;gap:10px;align-items:center}
@@ -11,39 +11,39 @@ header{display:flex;justify-content:space-between;align-items:center;border-bott
 .chrono{font-size:26px;font-weight:800;background:#000;padding:5px 12px;border-radius:8px;border:2px solid var(--r);font-variant-numeric:tabular-nums}
 .chrono.warn{animation:blink .6s steps(2) infinite}@keyframes blink{50%{color:var(--r)}}
 .card{background:#1d1d1d;border:1px solid #333;border-radius:12px;padding:20px;margin-bottom:12px}
-.brand{display:block;height:110px;margin:0 auto 12px}
-h1{color:var(--r);font-size:25px;margin-bottom:8px}h2{font-size:18px;margin-bottom:8px}p{line-height:1.5;margin-bottom:9px;color:#ddd}
+.brand{display:block;margin:4px auto 12px;width:120px;max-width:42%;height:auto}
+h1{color:var(--r);font-size:24px;margin-bottom:8px}h2{font-size:18px;margin-bottom:8px}p{line-height:1.5;margin-bottom:9px;color:#ddd}
 .pitch{font-style:italic;border-left:4px solid var(--o);padding-left:12px;color:#f0e6c8}
 .tag{display:inline-block;background:var(--r);color:#fff;font-weight:700;padding:3px 11px;border-radius:20px;font-size:12px;margin-bottom:8px}
 .tag.enig{background:#6b21a8}
 .scene{font-size:17px;color:#fff;margin-bottom:6px}
-.go{font-size:60px;font-weight:900;color:var(--o);text-align:center;padding:20px 0}
+.go{font-size:60px;font-weight:900;color:var(--o);text-align:center;padding:18px 0}
 .actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}@media(max-width:560px){.actions{grid-template-columns:1fr}}
 button.act{background:#2a2a2a;border:1px solid #444;color:#eee;padding:13px;border-radius:10px;text-align:left;cursor:pointer;font-size:14px}
 button.act:hover{border-color:var(--r)}button.act:disabled{opacity:.4;cursor:default}
-.big{background:var(--r);color:#fff;border:none;padding:14px 24px;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer}
+.big{background:var(--r);color:#fff;border:none;padding:14px 24px;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;width:100%}
 input,select{width:100%;padding:11px;border-radius:8px;border:1px solid #444;background:#161616;color:#eee;margin-bottom:10px;font-size:15px}
 label{font-size:13px;color:#aaa;display:block;margin-bottom:4px}
 .fb{margin-top:12px;padding:11px;border-radius:8px;font-weight:600}.ok{background:#16331f;color:#7be0a0;border:1px solid var(--v)}.ko{background:#3a1414;color:#ff9a9a;border:1px solid var(--r)}
 .meta{display:flex;gap:16px;font-size:13px;color:#aaa;margin-top:6px}.bar{height:8px;background:#333;border-radius:6px;overflow:hidden;margin-top:8px}.bar>i{display:block;height:100%;background:var(--v);width:0}
-.verdict{text-align:center;padding:26px}.code{font-size:34px;font-weight:900}.medal{font-size:54px}
+.verdict{text-align:center;padding:26px}.code{font-size:32px;font-weight:900}.medal{font-size:54px}
 .reco{background:#241a1a;border:1px solid var(--r);border-radius:10px;padding:12px;margin-top:9px;text-align:left}.reco b{color:var(--o)}.hide{display:none}
 footer{text-align:center;color:#777;font-size:11px;margin-top:14px}
-#splash{position:fixed;inset:0;background:radial-gradient(circle at 50% 40%,#1a1a1a,#070707);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;text-align:center;transition:opacity .8s}
+#splash{position:fixed;inset:0;background:radial-gradient(circle at 50% 40%,#1a1a1a,#070707);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;text-align:center;transition:opacity .8s;padding:20px}
 #splash.out{opacity:0;pointer-events:none}
-#splash img{width:180px;max-width:55%}
-#splash .stitle{color:#fff;font-size:30px;font-weight:900;letter-spacing:2px;margin-top:16px}#splash .stitle b{color:var(--r)}
+#splash img{width:170px;max-width:50%;height:auto}
+#splash .stitle{color:#fff;font-size:28px;font-weight:900;letter-spacing:2px;margin-top:16px}#splash .stitle b{color:var(--r)}
 #splash .stag{color:#bbb;margin-top:6px}
 #splash .skip{margin-top:20px;color:#fff;font-size:14px;background:var(--r);border:none;padding:10px 20px;border-radius:8px;cursor:pointer}
-@keyframes blink2{50%{opacity:.3}}@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes blink{50%{opacity:.3}}
 </style></head><body>
 <div id="splash" onclick="hideSplash()"><img src="logo.png" alt="ANDRAGOPS"><div class="stitle">OPÉRATION <b>SANG-FROID</b></div><div class="stag">Gardez la tête froide. Sauvez l'atelier.</div><button class="skip" onclick="hideSplash()">Commencer ▶</button></div>
 <div class="app">
-<header><div class="logo">OPÉRATION <span>SANG-FROID</span> · ANDRAGOPS</div><div class="hud"><span id="score" class="score hide">0 pts</span><div id="chrono" class="chrono hide">--:--</div></div></header>
+<header><div class="logo">OPÉRATION <span>SANG-FROID</span></div><div class="hud"><span id="score" class="score hide">0 pts</span><div id="chrono" class="chrono hide">--:--</div></div></header>
 <div id="intro" class="card"><img class="brand" src="logo.png" alt="ANDRAGOPS Académie"><span class="tag">ESCAPE GAME SÉCURITÉ · ÉNIGMES</span>
 <h1>L'inspecteur a disparu en plein audit…</h1>
-<p class="pitch">7h55. L'inspecteur sécurité devait valider l'Atelier B ce matin. Il a disparu, laissant une série d'épreuves et un atelier au bord de l'incident. Votre équipe a jusqu'à la fin du chrono pour tout résoudre — gestes qui sauvent, incendie, postures, gestion de crise — et décrocher le badge SANG-FROID. 😎</p>
-<p><b>Règle :</b> des situations à gérer et des énigmes à résoudre. Les bons réflexes rapportent des points, les erreurs coûtent 45 secondes. Le temps restant se transforme en bonus.</p>
+<p class="pitch">7h55. L'inspecteur sécurité devait valider l'Atelier B ce matin. Il a disparu, laissant des épreuves et un atelier au bord de l'incident. Votre équipe a jusqu'à la fin du chrono pour tout résoudre — gestes qui sauvent, incendie, postures, gestion de crise — et décrocher le badge SANG-FROID. 😎</p>
+<p><b>Règle :</b> des situations à gérer et des énigmes à résoudre. Les bons réflexes rapportent des points, les erreurs coûtent 45 s. Le temps restant se transforme en bonus.</p>
 <input id="equipe" placeholder="Nom de l'équipe (ex: Les Extincteurs de Benfeld)">
 <input id="site" placeholder="Site (ex: Benfeld) — facultatif">
 <label>Durée de la partie (compte à rebours de fin)</label>
@@ -90,7 +90,7 @@ function launch(){
   T0=t=parseInt($('duree').value,10)*60;
   $('intro').classList.add('hide');$('game').classList.remove('hide');
   $('chrono').classList.remove('hide');$('score').classList.remove('hide');$('chrono').textContent=fmt(t);
-  $('tag').textContent='PRÉPAREZ-VOUS';$('titre').textContent='La mission démarre…';$('acts').innerHTML='';$('fb').classList.add('hide');$('obj').textContent='';
+  $('tag').textContent='PRÉPAREZ-VOUS';$('tag').className='tag';$('titre').textContent='La mission démarre…';$('acts').innerHTML='';$('fb').classList.add('hide');$('obj').textContent='';
   var seq=['3','2','1','GO !'],k=0;$('scene').innerHTML='<div class="go">'+seq[0]+'</div>';
   var iv=setInterval(function(){k++;if(k<seq.length){$('scene').innerHTML='<div class="go">'+seq[k]+'</div>';}else{clearInterval(iv);beginGame();}},850);
   setTimeout(function(){try{clearInterval(iv)}catch(e){}if(!started)beginGame();},5000);
