@@ -87,6 +87,7 @@ function $(i){return document.getElementById(i)}
 function fmt(s){if(s<0)s=0;var m=Math.floor(s/60),x=s%60;return (m<10?'0':'')+m+':'+(x<10?'0':'')+x}
 function rnd(a){return a[Math.floor(Math.random()*a.length)]}
 function launch(){
+  if(window.GAMEOPEN===false){alert("Le jeu est fermé pour le moment. Revenez quand votre animateur l'aura ouvert.");return;}
   EQ=$('equipe').value||'(équipe non nommée)';SI=$('site').value||'';
   var v=$('nbsst').value;NBSST=(v===''?null:parseInt(v,10));
   T0=t=parseInt($('duree').value,10)*60;
@@ -115,4 +116,7 @@ var sstline=(NBSST!=null?"<br>SST déclarés dans l'équipe : <b>"+NBSST+"</b>":
 el.innerHTML="<div class='medal'>"+medal+"</div><div class='code' style='color:"+col+"'>"+grade+"</div><h2 style='margin-top:10px'>Score : "+score+" points</h2><p>Équipe : <b>"+EQ+"</b>"+sstline+"<br>Bonnes étapes : <b>"+bonnes+"/"+S.length+"</b> · Erreurs : <b>"+erreurs+"</b> · Temps restant : <b>"+fmt(Math.max(t,0))+"</b></p><h2>Mini-diagnostic</h2>"+reco+"<p id='envoye' style='color:#aaa;margin-top:10px'>Envoi du score au classement…</p><p style='color:#888;font-size:12px;margin-top:6px'>« Le jeu ouvre les yeux ; la formation, sur le terrain comme en salle, sauve des vies. »</p>";
 send(score);}
 function send(score){fetch(API,{method:'POST',body:JSON.stringify({equipe:EQ,site:SI,nb_sst:NBSST,score:score,temps_total:T0,temps_restant:Math.max(t,0),erreurs:erreurs,bonnes:bonnes,total:S.length,err_secours:et.secours,err_incendie:et.incendie,err_tms:et.tms,err_crise:et.crise})}).then(function(){$('envoye').textContent='✔ Score transmis au classement.'}).catch(function(){$('envoye').textContent='(score non transmis — réseau)'})}
+window.GAMEOPEN=true;
+function osfClosed(){var i=document.getElementById('intro');if(i){i.innerHTML="<img class='brand' src='logo.png' alt='ANDRAGOPS'><span class='tag'>CAMPAGNE FERMÉE</span><h1>Le jeu n'est pas ouvert pour le moment</h1><p>La mission OPÉRATION SANG-FROID est actuellement fermée. Revenez quand votre animateur l'aura ouverte. 🔒</p>";}}
+fetch(API+"?state=1&z="+Date.now()).then(function(r){return r.json()}).then(function(j){if(j&&j.open===false){window.GAMEOPEN=false;osfClosed();}}).catch(function(){});
 </script></body></html>
