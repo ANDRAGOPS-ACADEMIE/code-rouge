@@ -13,17 +13,36 @@ th{background:#C01A1A;color:#fff;padding:9px;text-align:left;font-size:12px}td{p
 h2{color:#222;margin:18px 0 6px;font-size:18px}
 .reco{background:#fff5f5;border:1px solid #C01A1A;border-radius:8px;padding:10px;margin-top:8px}.reco b{color:#C01A1A}
 footer{color:#888;font-size:12px;margin-top:16px}
+.tabbar{display:flex;gap:8px;margin:6px 0 16px;flex-wrap:wrap}
+.tab{border:none;padding:11px 20px;border-radius:8px 8px 0 0;font-weight:700;cursor:pointer;background:#e3e3e3;color:#555}
+.tab.active{background:#C01A1A;color:#fff}
+.tab.green{background:#cfe9d8;color:#1f6f3f}.tab.green.active{background:#1f8a4c;color:#fff}
+.pane{display:none}.pane.show{display:block}
+.radsel{margin:8px 0}.radsel select{padding:8px;border-radius:8px;border:1px solid #ccc;font-size:14px}
 </style></head><body>
 <h1>Opération Sang-Froid — Tableau de bord</h1>
 <div class="sub">ANDRAGOPS Académie · classement, statistiques et synthèse entreprise</div>
 <button class="btn" onclick="charger()">↻ Actualiser</button>
 <button class="btn alt" onclick="genWord()">📄 Générer la synthèse Word (entreprise)</button>
 <button class="btn" id="toggleBtn" onclick="toggleGame()" style="background:#555">⏳ État du jeu…</button>
+<div class="tabbar">
+  <button class="tab active" id="tabBtnS" onclick="showTab('S')">📊 Synthèse</button>
+  <button class="tab green" id="tabBtnR" onclick="showTab('R')">🕸️ Radar des lacunes</button>
+</div>
+<div id="paneS" class="pane show">
 <div id="kpis"></div>
 <h2>🏆 Classement</h2>
 <table><thead><tr><th>#</th><th>Équipe</th><th>Site</th><th>SST</th><th>Score</th><th>Bonnes</th><th>Erreurs</th><th>Temps restant</th><th>Date</th></tr></thead><tbody id="rows"><tr><td colspan="9" style="padding:16px">Chargement…</td></tr></tbody></table>
 <h2>Analyse par domaine (priorités de formation)</h2>
 <div id="reco"></div>
+</div>
+<div id="paneR" class="pane">
+<h2 style="color:#1f8a4c">🕸️ Radar des lacunes des salariés</h2>
+<div class="radsel">Vue : <select id="radSel" onchange="drawLacunes()"><option value="all">Toutes les équipes (cumul)</option></select></div>
+<canvas id="radL" width="420" height="420" style="display:block;margin:10px auto;max-width:100%"></canvas>
+<div id="radLegend"></div>
+<p style="color:#888;font-size:12px">Plus l'aire s'étire sur un axe, plus les erreurs y sont nombreuses : c'est là que le besoin de formation est le plus fort.</p>
+</div>
 <footer>Page privée ANDRAGOPS — ne pas diffuser. Code d'accès requis.</footer>
 <script>
 var API="https://eumviuptmyzgftrqpape.supabase.co/functions/v1/mission";
@@ -38,6 +57,7 @@ function charger(){if(!CODE){var c=prompt("Code d'accès :","");if(!c)return;COD
 fetch(API+"?admin="+encodeURIComponent(CODE)+"&z="+Date.now()).then(function(r){return r.json()}).then(function(rows){
  if(!Array.isArray(rows)){$('rows').innerHTML="<tr><td colspan=9 style='padding:16px;color:#C01A1A'>Code incorrect. <a href='#' onclick='localStorage.removeItem(\"cr_code\");location.reload()'>réessayer</a></td></tr>";return}
  DATA=rows.slice().sort(function(a,b){return (b.score||0)-(a.score||0)});
+ populateRadSel();if($('paneR')&&$('paneR').className.indexOf('show')>=0)drawLacunes();
  var n=DATA.length;var moy=n?Math.round(DATA.reduce(function(s,r){return s+(r.score||0)},0)/n):0;var best=n?DATA[0].score:0;
  var totsst=DATA.reduce(function(s,r){return s+(parseInt(r.nb_sst,10)||0)},0);
  $('kpis').innerHTML="<div class='k'>Parties<b>"+n+"</b></div><div class='k'>Score moyen<b>"+moy+"</b></div><div class='k'>Meilleur score<b>"+best+"</b></div><div class='k'>SST déclarés (cumul)<b>"+totsst+"</b></div>";
@@ -69,6 +89,22 @@ function genWord(){
  var blob=new Blob(['﻿'+html],{type:'application/msword'});
  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download="Synthese_Securite_Operation_Sang-Froid.doc";document.body.appendChild(a);a.click();document.body.removeChild(a);
 }
+var LK=['err_secours','err_incendie','err_tms','err_crise'];
+var LL={err_secours:'Secours',err_incendie:'Incendie',err_tms:'TMS',err_crise:'Crise'};
+function populateRadSel(){var s=$('radSel');if(!s)return;var cur=s.value;s.innerHTML="<option value='all'>Toutes les équipes (cumul)</option>"+DATA.map(function(r,i){return "<option value='"+i+"'>"+esc(r.equipe||('Équipe '+(i+1)))+"</option>"}).join("");if(cur)s.value=cur;}
+function drawLacunes(){var sel=$('radSel')?$('radSel').value:'all';var v={};LK.forEach(function(k){v[k]=0});
+ if(sel==='all'){DATA.forEach(function(r){LK.forEach(function(k){v[k]+=(r[k]||0)})});}else{var r=DATA[parseInt(sel,10)]||{};LK.forEach(function(k){v[k]=(r[k]||0)});}
+ var max=Math.max(1,Math.max.apply(null,LK.map(function(k){return v[k]})));
+ var c=$('radL');if(!c)return;var x=c.getContext('2d'),cx=210,cy=210,R=150,n=LK.length;x.clearRect(0,0,420,420);
+ var ang=[];for(var k=0;k<n;k++)ang.push(-Math.PI/2+2*Math.PI*k/n);
+ x.strokeStyle='#ccc';for(var g=1;g<=4;g++){x.beginPath();for(var k=0;k<n;k++){var rr=R*g/4,px=cx+rr*Math.cos(ang[k]),py=cy+rr*Math.sin(ang[k]);k?x.lineTo(px,py):x.moveTo(px,py)}x.closePath();x.stroke()}
+ x.strokeStyle='#bbb';for(var k=0;k<n;k++){x.beginPath();x.moveTo(cx,cy);x.lineTo(cx+R*Math.cos(ang[k]),cy+R*Math.sin(ang[k]));x.stroke()}
+ x.beginPath();for(var k=0;k<n;k++){var rr=R*(v[LK[k]]/max),px=cx+rr*Math.cos(ang[k]),py=cy+rr*Math.sin(ang[k]);k?x.lineTo(px,py):x.moveTo(px,py)}x.closePath();x.fillStyle='rgba(31,138,76,.35)';x.fill();x.strokeStyle='#1f8a4c';x.lineWidth=2;x.stroke();
+ x.fillStyle='#222';x.font='13px Arial';x.textAlign='center';for(var k=0;k<n;k++){var lx=cx+(R+26)*Math.cos(ang[k]),ly=cy+(R+26)*Math.sin(ang[k])+4;x.fillText(LL[LK[k]]+' ('+v[LK[k]]+')',lx,ly)}
+ var tot=LK.reduce(function(s,k){return s+v[k]},0);var worst=LK.slice().sort(function(a,b){return v[b]-v[a]})[0];
+ $('radLegend').innerHTML = tot? ("<div class='reco' style='border-color:#1f8a4c;background:#f0faf3;color:#1a5">Domaine le plus en difficulté : <b style='color:#1f8a4c'>"+LL[worst]+"</b> — "+v[worst]+" erreur(s). Formation prioritaire conseillée.</div>") : "<p style='color:#1f6f3f'>Aucune erreur enregistrée — radar vierge, excellent niveau global.</p>";
+}
+function showTab(t){var s=(t==='S');$('paneS').className='pane'+(s?' show':'');$('paneR').className='pane'+(s?'':' show');$('tabBtnS').className='tab'+(s?' active':'');$('tabBtnR').className='tab green'+(s?'':' active');if(!s){populateRadSel();drawLacunes();}}
 function setBtn(open){var b=document.getElementById('toggleBtn');if(!b)return;b.textContent=open?"🟢 Jeu OUVERT — cliquer pour FERMER":"🔴 Jeu FERMÉ — cliquer pour OUVRIR";b.style.background=open?"#1f6f3f":"#C01A1A";b.dataset.open=open?"1":"0";}
 function refreshState(){fetch(API+"?state=1&z="+Date.now()).then(function(r){return r.json()}).then(function(j){setBtn(j&&j.open!==false)}).catch(function(){})}
 function toggleGame(){if(!CODE){var c=prompt("Code d'accès :","");if(!c)return;CODE=c;localStorage.setItem('cr_code',c)}var b=document.getElementById('toggleBtn');var open=b.dataset.open==="1";var set=open?"close":"open";if(!confirm(open?"Fermer le jeu aux participants ?":"Ouvrir le jeu aux participants ?"))return;fetch(API+"?admin="+encodeURIComponent(CODE)+"&set="+set+"&z="+Date.now()).then(function(r){return r.json()}).then(function(j){if(j&&typeof j.open!=='undefined'){setBtn(j.open)}else{alert('Action refusée — vérifie le code d’accès.')}}).catch(function(){alert('Erreur réseau')})}
