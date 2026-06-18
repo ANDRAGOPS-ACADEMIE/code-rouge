@@ -79,7 +79,7 @@ var MAX={};AXO.forEach(function(a){MAX[a]=0});
 Q.forEach(function(q){var m=Math.max.apply(null,q.o.map(function(x){return x[1]}));MAX[q.ax]+=m});
 var sc={};AXO.forEach(function(a){sc[a]=0});var i=0,EQ="",SI="",NB=null;
 function $(x){return document.getElementById(x)}
-function start(){EQ=$('equipe').value||'(équipe non nommée)';SI=$('site').value||'';NB=parseInt($('nbsst').value,10);if(isNaN(NB))NB=null;$('intro').className='card hide';$('q').className='card';render()}
+function start(){if(window.GAMEOPEN===false){alert("Le bilan est fermé pour le moment. Revenez quand votre animateur l'aura ouvert.");return;}EQ=$('equipe').value||'(équipe non nommée)';SI=$('site').value||'';NB=parseInt($('nbsst').value,10);if(isNaN(NB))NB=null;$('intro').className='card hide';$('q').className='card';render()}
 function render(){var q=Q[i];$('prog').textContent='Situation '+(i+1)+' / '+Q.length;$('bar').style.width=Math.round(i/Q.length*100)+'%';$('cat').textContent=CAT[q.ax];$('scene').textContent=q.s;var oo=q.o.slice();for(var z=oo.length-1;z>0;z--){var w=Math.floor(Math.random()*(z+1)),tt=oo[z];oo[z]=oo[w];oo[w]=tt;}var bx=$('opts');bx.innerHTML='';oo.forEach(function(op){var b=document.createElement('button');b.className='opt';b.textContent=op[0];b.onclick=function(){sc[q.ax]+=op[1];i++;if(i>=Q.length){fin()}else{render()}};bx.appendChild(b)})}
 function pct(k){return MAX[k]?Math.round(sc[k]/MAX[k]*100):0}
 function fin(){$('q').className='card hide';$('prog').textContent='Terminé';
@@ -100,4 +100,7 @@ x.beginPath();for(var k=0;k<n;k++){var rr=R*P[AXO[k]]/100,px=cx+rr*Math.cos(ang[
 var SL={secours:"Secours",incendie:"Incendie",tms:"TMS",vigilance:"Vigilance",crise:"Crise"};x.fillStyle='#ddd';x.font='12px Arial';x.textAlign='center';
 for(var k=0;k<n;k++){var lx=cx+(R+22)*Math.cos(ang[k]),ly=cy+(R+22)*Math.sin(ang[k])+4;x.fillText(SL[AXO[k]],lx,ly)}}
 function send(P){fetch(API,{method:'POST',body:JSON.stringify({equipe:EQ,site:SI,nb_sst:NB,secours:P.secours,incendie:P.incendie,tms:P.tms,vigilance:P.vigilance,crise:P.crise})}).then(function(){$('envoye').textContent='Bilan transmis à l’animateur.'}).catch(function(){$('envoye').textContent='(bilan non transmis — réseau)'})}
+window.GAMEOPEN=true;
+function proClosed(){var i=document.getElementById('intro');if(i){i.innerHTML="<img class='brand' src='logo.png' alt='ANDRAGOPS Académie'><h1>Bilan fermé pour le moment</h1><p>Le Profil Sécurité est actuellement fermé. Revenez quand votre animateur l'aura ouvert. 🔒</p>";}}
+fetch(API+"?state=1&z="+Date.now()).then(function(r){return r.json()}).then(function(j){if(j&&j.open===false){window.GAMEOPEN=false;proClosed();}}).catch(function(){});
 </script></body></html>
