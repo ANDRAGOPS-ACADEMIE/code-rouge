@@ -90,7 +90,7 @@ AXO.forEach(function(k){var v=P[k];var t=v>=75?'point fort':(v>=55?'correct':'à
 html+="</div>";var gaps=AXO.filter(function(k){return P[k]<60}).sort(function(a,b){return P[a]-P[b]});
 if(gaps.length){html+="<h2>Priorités recommandées</h2>";gaps.forEach(function(k){html+="<div class='reco'><b>"+L[k]+" ("+P[k]+"%)</b> → "+reco[k]+"</div>"})}
 else{html+="<div class='reco'>Profil solide sur les 5 axes ! Pour entretenir : recyclages SST et exercices incendie réguliers.</div>"}
-html+="<p id='envoye' style='color:#aaa;margin-top:12px'>Envoi du bilan…</p><p style='color:#888;font-size:12px'>Bilan indicatif — la certification se fait en présentiel (80% de pratique).</p>";
+html+="<p id='envoye' style='color:#aaa;margin-top:12px'>Envoi du bilan…</p><p style='color:#888;font-size:12px'>« Le jeu ouvre les yeux ; la formation, sur le terrain comme en salle, sauve des vies. » Bilan indicatif, non certifiant.</p>";
 $('res').className='card';$('res').innerHTML=html;radar(P);send(P)}
 function radar(P){var c=$('rad'),x=c.getContext('2d'),cx=160,cy=165,R=110;var n=AXO.length;var ang=[];for(var k=0;k<n;k++){ang.push(-Math.PI/2+2*Math.PI*k/n)}
 x.strokeStyle='#444';for(var g=1;g<=4;g++){x.beginPath();for(var k=0;k<n;k++){var rr=R*g/4,px=cx+rr*Math.cos(ang[k]),py=cy+rr*Math.sin(ang[k]);k?x.lineTo(px,py):x.moveTo(px,py)}x.closePath();x.stroke()}
