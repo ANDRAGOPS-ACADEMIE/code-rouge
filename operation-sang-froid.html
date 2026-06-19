@@ -36,6 +36,11 @@ footer{text-align:center;color:#777;font-size:11px;margin-top:14px}
 #splash .stag{color:#bbb;margin-top:6px}
 #splash .skip{margin-top:20px;color:#fff;font-size:14px;background:var(--r);border:none;padding:10px 20px;border-radius:8px;cursor:pointer}
 @keyframes blink{50%{opacity:.3}}
+.board-ov{position:fixed;inset:0;background:rgba(8,8,8,.94);z-index:900;display:flex;align-items:flex-start;justify-content:center;padding:24px;overflow:auto}
+.board-ov.hide{display:none}
+.board-card{background:#1d1d1d;border:1px solid #333;border-radius:14px;padding:20px;max-width:560px;width:100%}
+.brow{display:flex;align-items:center;gap:10px;padding:11px 12px;border-bottom:1px solid #2c2c2c}
+.brow b{color:#fff}.brank{color:var(--o);font-weight:800;min-width:34px;font-size:17px}.bscore{color:#7be0a0;font-weight:700;white-space:nowrap}
 </style></head><body>
 <div id="splash" onclick="hideSplash()"><img src="logo.png" alt="ANDRAGOPS"><div class="stitle">OPÉRATION <b>SANG-FROID</b></div><div class="stag">Gardez la tête froide. Sauvez l'atelier.</div><button class="skip" onclick="hideSplash()">Commencer ▶</button></div>
 <div class="app">
@@ -50,11 +55,18 @@ footer{text-align:center;color:#777;font-size:11px;margin-top:14px}
 <input id="nbsst" type="number" min="0" inputmode="numeric" placeholder="Nombre de SST dans l'équipe">
 <label>Durée de la partie (compte à rebours de fin)</label>
 <select id="duree"><option value="10">10 minutes (express)</option><option value="15">15 minutes</option><option value="18" selected>18 minutes (recommandé)</option><option value="25">25 minutes (détendu)</option></select>
-<button class="big" onclick="launch()">Lancer la mission</button></div>
+<button class="big" onclick="launch()">▶ Commencer à jouer</button>
+<button class="big" style="background:#2a2a2a;border:1px solid var(--r);margin-top:8px" onclick="showBoard()">🏆 Voir le classement des équipes</button></div>
 <div id="game" class="card hide"><span id="tag" class="tag"></span><h2 id="titre"></h2><p id="scene" class="scene"></p>
 <div class="bar"><i id="prog"></i></div><div class="meta"><span id="obj"></span><span id="err">Erreurs : 0</span></div>
 <div id="acts" class="actions"></div><div id="fb" class="fb hide"></div></div>
 <div id="fin" class="card verdict hide"></div>
+<div id="boardScreen" class="board-ov hide"><div class="board-card">
+<h2 style="color:var(--o)">🏆 Classement des équipes</h2>
+<p style="color:#aaa;font-size:13px;margin-bottom:8px">Le tableau d'honneur d'OPÉRATION SANG-FROID. Seuls les scores sont affichés.</p>
+<div id="boardList">Chargement…</div>
+<button class="big" style="margin-top:14px" onclick="closeBoard()">← Retour</button>
+</div></div>
 <footer>ANDRAGOPS Académie · andragops-academie.fr · Outil d'accroche, non certifiant.</footer></div>
 <script>
 var API="https://eumviuptmyzgftrqpape.supabase.co/functions/v1/mission";
@@ -117,9 +129,18 @@ if(et.tms>0)reco+="<div class='reco'><b>Gestes & postures :</b> prévention des 
 if(et.crise>0)reco+="<div class='reco'><b>Gestion de crise :</b> réflexes à structurer. → <b>Gestion de Crise & Incivilités</b>.</div>";
 if(!reco)reco="<div class='reco'>Sans-faute ! Pour entretenir ce niveau : recyclages et exercices réguliers en présentiel (80% de pratique).</div>";
 var sstline=(NBSST!=null?"<br>SST déclarés dans l'équipe : <b>"+NBSST+"</b>":"");
-el.innerHTML="<div class='medal'>"+medal+"</div><div class='code' style='color:"+col+"'>"+grade+"</div><h2 style='margin-top:10px'>Score : "+score+" points</h2><p>Équipe : <b>"+EQ+"</b>"+sstline+"<br>Bonnes étapes : <b>"+bonnes+"/"+S.length+"</b> · Erreurs : <b>"+erreurs+"</b> · Temps restant : <b>"+fmt(Math.max(t,0))+"</b></p><h2>Mini-diagnostic</h2>"+reco+"<p id='envoye' style='color:#aaa;margin-top:10px'>Envoi du score au classement…</p><p style='color:#888;font-size:12px;margin-top:6px'>« Le jeu ouvre les yeux ; la formation, sur le terrain comme en salle, sauve des vies. »</p>";
+el.innerHTML="<div class='medal'>"+medal+"</div><div class='code' style='color:"+col+"'>"+grade+"</div><h2 style='margin-top:10px'>Score : "+score+" points</h2><p>Équipe : <b>"+EQ+"</b>"+sstline+"<br>Bonnes étapes : <b>"+bonnes+"/"+S.length+"</b> · Erreurs : <b>"+erreurs+"</b> · Temps restant : <b>"+fmt(Math.max(t,0))+"</b></p><h2>Mini-diagnostic</h2>"+reco+"<p id='envoye' style='color:#aaa;margin-top:10px'>Envoi du score au classement…</p><p style='color:#888;font-size:12px;margin-top:6px'>« Le jeu ouvre les yeux ; la formation, sur le terrain comme en salle, sauve des vies. »</p><button class='big' style='margin-top:14px' onclick='showBoard()'>🏆 Voir le classement des équipes</button>";
 send(score);}
 function send(score){fetch(API,{method:'POST',body:JSON.stringify({equipe:EQ,site:SI,nb_sst:NBSST,score:score,temps_total:T0,temps_restant:Math.max(t,0),erreurs:erreurs,bonnes:bonnes,total:S.length,err_secours:et.secours,err_incendie:et.incendie,err_tms:et.tms,err_crise:et.crise})}).then(function(){$('envoye').textContent='✔ Score transmis au classement.'}).catch(function(){$('envoye').textContent='(score non transmis — réseau)'})}
+function be(s){return String(s==null?'':s).replace(/[&<>]/g,function(c){return c=='&'?'&amp;':c=='<'?'&lt;':'&gt;'})}
+function showBoard(){var ov=document.getElementById('boardScreen');ov.classList.remove('hide');var L=document.getElementById('boardList');L.innerHTML='Chargement…';
+ fetch(API+"?board=1&z="+Date.now()).then(function(r){return r.json()}).then(function(rows){
+  if(!Array.isArray(rows)||!rows.length){L.innerHTML="<p style='color:#aaa'>Aucune équipe au classement pour le moment. Soyez les premiers à jouer !</p>";return}
+  var med=["🥇","🥈","🥉"];
+  L.innerHTML=rows.map(function(r,i){return "<div class='brow'><span class='brank'>"+(i<3?med[i]:(i+1))+"</span><b style='flex:1'>"+be(r.equipe||'(équipe)')+(r.site?" <span style='color:#888;font-weight:400'>· "+be(r.site)+"</span>":"")+"</b><span class='bscore'>"+(r.score||0)+" pts</span></div>"}).join("");
+ }).catch(function(){L.innerHTML="<p style='color:#ff9a9a'>Classement indisponible (réseau).</p>"});
+}
+function closeBoard(){document.getElementById('boardScreen').classList.add('hide');}
 window.GAMEOPEN=true;
 function osfClosed(){var i=document.getElementById('intro');if(i){i.innerHTML="<img class='brand' src='logo.png' alt='ANDRAGOPS'><span class='tag'>CAMPAGNE FERMÉE</span><h1>Le jeu n'est pas ouvert pour le moment</h1><p>La mission OPÉRATION SANG-FROID est actuellement fermée. Revenez quand votre animateur l'aura ouverte. 🔒</p>";}}
 fetch(API+"?state=1&z="+Date.now()).then(function(r){return r.json()}).then(function(j){if(j&&j.open===false){window.GAMEOPEN=false;osfClosed();}}).catch(function(){});
