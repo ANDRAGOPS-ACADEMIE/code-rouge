@@ -68,6 +68,7 @@ footer{color:var(--mut);font-size:12px;margin-top:18px;text-align:center}
 <div class="toolbar">
   <button class="btn" onclick="charger()">↻ Actualiser</button>
   <button class="btn ghost" onclick="genWord()">📄 Synthèse Word (entreprise)</button>
+  <button class="btn" style="background:#7a1010" onclick="resetGame()">🗑️ Réinitialiser (remise à zéro)</button>
 </div>
 
 <div class="tabbar">
@@ -105,6 +106,12 @@ function sst(r){return (r.nb_sst==null||r.nb_sst==='')?'—':r.nb_sst}
 function setSwitch(open){var sw=$('sw'),lbl=$('stateLabel');if(!sw)return;sw.dataset.open=open?'1':'0';sw.classList.toggle('on',!!open);sw.classList.toggle('off',!open);lbl.textContent=open?'🟢 JEU EN MARCHE':'🔴 JEU SUSPENDU';lbl.className='state-label '+(open?'lon':'loff');}
 function refreshState(){fetch(API+"?state=1&z="+Date.now()).then(function(r){return r.json()}).then(function(j){setSwitch(j&&j.open!==false)}).catch(function(){})}
 function toggleGame(){if(!CODE){var c=prompt("Code d'accès :","");if(!c)return;CODE=c;localStorage.setItem('cr_code',c)}var sw=$('sw');var open=sw.dataset.open==='1';var set=open?'close':'open';if(!confirm(open?'Suspendre le jeu ? Les équipes ne pourront plus le lancer.':'Démarrer le jeu ? Les équipes pourront jouer.'))return;$('stateLabel').textContent='…';fetch(API+"?admin="+encodeURIComponent(CODE)+"&set="+set+"&z="+Date.now()).then(function(r){return r.json()}).then(function(j){if(j&&typeof j.open!=='undefined'){setSwitch(j.open)}else{alert('Action refusée — vérifie le code d’accès.');refreshState()}}).catch(function(){alert('Erreur réseau');refreshState()})}
+
+/* ===== RESET ===== */
+function resetGame(){if(!CODE){var c=prompt("Code d'accès :","");if(!c)return;CODE=c;localStorage.setItem('cr_code',c)}
+ if(!confirm("⚠️ Effacer TOUTES les parties et remettre le classement à zéro ? Action irréversible."))return;
+ if(!confirm("Dernière confirmation : tout remettre à zéro ?"))return;
+ fetch(API+"?admin="+encodeURIComponent(CODE)+"&reset=1&z="+Date.now()).then(function(r){return r.json()}).then(function(j){if(j&&j.ok){alert("✅ Classement remis à zéro.");charger();}else{alert("Échec — vérifie le code d’accès.")}}).catch(function(){alert("Erreur réseau")})}
 
 /* ===== DATA ===== */
 function charger(){if(!CODE){var c=prompt("Code d'accès :","");if(!c)return;CODE=c;localStorage.setItem('cr_code',c)}
