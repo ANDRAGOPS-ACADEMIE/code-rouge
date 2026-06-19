@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tableau de bord — RÉFLEXE FEU | ANDRAGOPS</title>
+<style>
+:root{--r:#C01A1A;--o:#ef7d00;--g:#1f8a4c;--ink:#1d2330;--mut:#6b7280;--card:#ffffff;--line:#e6e9ef}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,Arial,sans-serif;background:linear-gradient(180deg,#fbf7f3,#eef1f5);color:var(--ink);padding:22px;max-width:1080px;margin:0 auto}
+.top{display:flex;align-items:center;gap:14px;border-bottom:3px solid var(--o);padding-bottom:14px;margin-bottom:18px}
+.brand{font-weight:800;letter-spacing:.5px;font-size:20px}.brand span{color:var(--o)}
+.top .sub{color:var(--mut);font-size:13px;margin-top:2px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.btn{background:var(--o);color:#1a1a1a;border:none;padding:11px 18px;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.btn:hover{filter:brightness(.97)}
+.ctrl{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px;display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:18px;box-shadow:0 6px 18px rgba(20,30,60,.06)}
+.ctrl-title{font-size:13px;color:var(--mut);text-transform:uppercase;letter-spacing:1px;font-weight:700}
+.state-label{font-size:24px;font-weight:900;margin:4px 0 2px}
+.state-label.lon{color:var(--g)}.state-label.loff{color:var(--r)}
+.ctrl-hint{font-size:12px;color:var(--mut)}
+.switch{position:relative;width:128px;height:56px;border-radius:30px;border:none;cursor:pointer;background:#cfd6e0;transition:background .25s;flex:0 0 auto}
+.switch.on{background:var(--g)}.switch.off{background:var(--r)}
+.switch .knob{position:absolute;top:5px;left:5px;width:46px;height:46px;border-radius:50%;background:#fff;transition:left .25s;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+.switch.on .knob{left:77px}
+.switch .onoff{position:absolute;top:0;height:56px;line-height:56px;font-weight:800;font-size:13px;color:#fff}
+.switch .onoff.on{left:16px}.switch .onoff.off{right:14px}
+.switch.on .onoff.off{opacity:.25}.switch.off .onoff.on{opacity:.25}
+.tabbar{display:flex;gap:8px;flex-wrap:wrap}
+.tab{border:1px solid var(--line);border-bottom:none;padding:12px 22px;border-radius:12px 12px 0 0;font-weight:700;cursor:pointer;background:#e9edf3;color:#52607a;font-size:14px}
+.tab.active{background:var(--card);color:var(--o);box-shadow:0 -2px 0 var(--o) inset}
+.tab.green{background:#dff1e6;color:var(--g)}.tab.green.active{background:var(--card);color:var(--g);box-shadow:0 -2px 0 var(--g) inset}
+.panewrap{background:var(--card);border:1px solid var(--line);border-radius:0 14px 14px 14px;padding:18px;box-shadow:0 6px 18px rgba(20,30,60,.05)}
+.pane{display:none}.pane.show{display:block}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:8px}
+.k{background:#f7f9fc;border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.k .n{font-size:12px;color:var(--mut);font-weight:600}.k b{font-size:26px;display:block;margin-top:4px;color:var(--ink)}
+h2{font-size:16px;margin:18px 0 8px;color:var(--ink)}
+table{width:100%;border-collapse:collapse;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+th{background:var(--o);color:#1a1a1a;padding:10px;text-align:left;font-size:12px;font-weight:700}
+td{padding:9px 10px;border-top:1px solid var(--line);font-size:13px}
+tr:nth-child(even) td{background:#fafbfd}
+.podium td{font-weight:700}.medal{font-size:18px}
+.reco{background:#fff6ef;border:1px solid #f3d5b5;border-left:4px solid var(--o);border-radius:8px;padding:11px 12px;margin-top:8px;font-size:14px}.reco b{color:#b35900}
+.radsel{margin:6px 0 10px;font-size:14px}.radsel select{padding:9px;border-radius:8px;border:1px solid var(--line);font-size:14px}
+canvas{display:block;margin:12px auto;max-width:100%}
+footer{color:var(--mut);font-size:12px;margin-top:18px;text-align:center}
+</style></head><body>
+<div class="top">
+  <div>
+    <div class="brand">RÉFLEXE <span>FEU</span> — Tableau de bord</div>
+    <div class="sub">ANDRAGOPS Académie · pilotage du défi incendie, classement et points faibles</div>
+  </div>
+</div>
+<div class="ctrl">
+  <div>
+    <div class="ctrl-title">Démarrer / Suspendre le jeu</div>
+    <div id="stateLabel" class="state-label">Vérification…</div>
+    <div class="ctrl-hint">ON = les joueurs peuvent jouer · OFF = jeu suspendu (écran « fermé » côté joueur).</div>
+  </div>
+  <button id="sw" class="switch" onclick="toggleGame()" title="Démarrer ou suspendre le jeu">
+    <span class="onoff on">ON</span><span class="onoff off">OFF</span><span class="knob"></span>
+  </button>
+</div>
+<div class="toolbar">
+  <button class="btn" onclick="charger()">↻ Actualiser</button>
+  <button class="btn ghost" onclick="genWord()">📄 Synthèse Word (entreprise)</button>
+  <button class="btn" style="background:#7a1010;color:#fff" onclick="resetGame()">🗑️ Réinitialiser (remise à zéro)</button>
+</div>
+<div class="tabbar">
+  <button class="tab active" id="tabBtnS" onclick="showTab('S')">📊 Synthèse</button>
+  <button class="tab green" id="tabBtnR" onclick="showTab('R')">🕸️ Radar des points faibles</button>
+</div>
+<div class="panewrap">
+  <div id="paneS" class="pane show">
+    <div id="kpis" class="kpis"></div>
+    <h2>🏆 Classement individuel</h2>
+    <table><thead><tr><th>#</th><th>Pseudo</th><th>Site/service</th><th>Score</th><th>Bonnes</th><th>Erreurs</th><th>Temps restant</th><th>Date</th></tr></thead><tbody id="rows"><tr><td colspan="8" style="padding:16px">Chargement…</td></tr></tbody></table>
+    <h2>Analyse par thème incendie</h2>
+    <div id="reco"></div>
+  </div>
+  <div id="paneR" class="pane">
+    <h2 style="color:#1f8a4c">🕸️ Radar des points faibles incendie</h2>
+    <div class="radsel">Vue : <select id="radSel" onchange="drawLac()"><option value="all">Tous les joueurs (cumul)</option></select></div>
+    <canvas id="radL" width="420" height="420"></canvas>
+    <div id="radLegend"></div>
+    <p style="color:#6b7280;font-size:12px">Plus l'aire s'étire sur un axe, plus les erreurs y sont nombreuses : c'est le thème à retravailler en priorité.</p>
+  </div>
+</div>
+<footer>Page privée ANDRAGOPS — ne pas diffuser. Code d'accès requis.</footer>
+<script>
+var API="https://eumviuptmyzgftrqpape.supabase.co/functions/v1/feu";
+var CODE=localStorage.getItem('cr_code')||"";
+var DATA=[];
+var DOM={err_prevention:["Prévention","Sensibilisation prévention incendie"],err_evacuation:["Évacuation / alerte","Exercice d'évacuation + consignes"],err_extinction:["Extincteurs / attaque du feu","Manipulation des extincteurs / EPI"],err_comportement:["Comportement face au feu","Mise en situation pratique"]};
+function $(x){return document.getElementById(x)}
+function esc(s){return String(s==null?"":s).replace(/[&<>]/g,function(c){return c=='&'?'&amp;':c=='<'?'&lt;':'&gt;'})}
+function fmt(s){s=s||0;return Math.floor(s/60)+'m'+(s%60)+'s'}
+/* ON/OFF */
+function setSwitch(open){var sw=$('sw'),lbl=$('stateLabel');if(!sw)return;sw.dataset.open=open?'1':'0';sw.classList.toggle('on',!!open);sw.classList.toggle('off',!open);lbl.textContent=open?'🟢 JEU EN MARCHE':'🔴 JEU SUSPENDU';lbl.className='state-label '+(open?'lon':'loff');}
+function refreshState(){fetch(API+"?state=1&z="+Date.now()).then(function(r){return r.json()}).then(function(j){setSwitch(j&&j.open!==false)}).catch(function(){})}
+function toggleGame(){if(!CODE){var c=prompt("Code d'accès :","");if(!c)return;CODE=c;localStorage.setItem('cr_code',c)}var sw=$('sw');var open=sw.dataset.open==='1';var set=open?'close':'open';if(!confirm(open?'Suspendre le jeu ? Les joueurs ne pourront plus le lancer.':'Démarrer le jeu ? Les joueurs pourront jouer.'))return;$('stateLabel').textContent='…';fetch(API+"?admin="+encodeURIComponent(CODE)+"&set="+set+"&z="+Date.now()).then(function(r){return r.json()}).then(function(j){if(j&&typeof j.open!=='undefined'){setSwitch(j.open)}else{alert('Action refusée — vérifie le code.');refreshState()}}).catch(function(){alert('Erreur réseau');refreshState()})}
+/* RESET */
+function resetGame(){if(!CODE){var c=prompt("Code d'accès :","");if(!c)return;CODE=c;localStorage.setItem('cr_code',c)}
+ if(!confirm("⚠️ Effacer TOUS les scores et remettre le classement à zéro ? Action irréversible."))return;
+ if(!confirm("Dernière confirmation : tout remettre à zéro ?"))return;
+ fetch(API+"?admin="+encodeURIComponent(CODE)+"&reset=1&z="+Date.now()).then(function(r){return r.json()}).then(function(j){if(j&&j.ok){alert("✅ Classement remis à zéro.");charger();}else{alert("Échec — vérifie le code.")}}).catch(function(){alert("Erreur réseau")})}
+/* DATA */
+function charger(){if(!CODE){var c=prompt("Code d'accès :","");if(!c)return;CODE=c;localStorage.setItem('cr_code',c)}
+fetch(API+"?admin="+encodeURIComponent(CODE)+"&z="+Date.now()).then(function(r){return r.json()}).then(function(rows){
+ if(!Array.isArray(rows)){$('rows').innerHTML="<tr><td colspan=8 style='padding:16px;color:#C01A1A'>Code incorrect. <a href='#' onclick='localStorage.removeItem(\"cr_code\");location.reload()'>réessayer</a></td></tr>";return}
+ DATA=rows.slice().sort(function(a,b){return (b.score||0)-(a.score||0)});
+ populateRadSel();if($('paneR')&&$('paneR').className.indexOf('show')>=0)drawLac();
+ var n=DATA.length;var moy=n?Math.round(DATA.reduce(function(s,r){return s+(r.score||0)},0)/n):0;var best=n?DATA[0].score:0;
+ $('kpis').innerHTML="<div class='k'><div class='n'>Parties jouées</div><b>"+n+"</b></div><div class='k'><div class='n'>Score moyen</div><b>"+moy+"</b></div><div class='k'><div class='n'>Meilleur score</div><b>"+best+"</b></div>";
+ var med=["🥇","🥈","🥉"];
+ $('rows').innerHTML=n?DATA.map(function(r,i){return "<tr class='"+(i<3?'podium':'')+"'><td class='medal'>"+(i<3?med[i]:(i+1))+"</td><td>"+esc(r.pseudo)+"</td><td>"+esc(r.site)+"</td><td>"+(r.score||0)+"</td><td>"+(r.bonnes||0)+"/"+(r.total||0)+"</td><td>"+(r.erreurs||0)+"</td><td>"+fmt(r.temps_restant)+"</td><td>"+(r.created_at?new Date(r.created_at).toLocaleString('fr-FR'):'')+"</td></tr>"}).join(""):"<tr><td colspan=8 style='padding:16px'>Aucune partie pour le moment.</td></tr>";
+ var tot={err_prevention:0,err_evacuation:0,err_extinction:0,err_comportement:0};DATA.forEach(function(r){for(var k in tot)tot[k]+=(r[k]||0)});
+ var ks=Object.keys(tot).sort(function(a,b){return tot[b]-tot[a]});var html="";ks.forEach(function(k){if(tot[k]>0)html+="<div class='reco'><b>"+DOM[k][0]+"</b> — "+tot[k]+" erreur(s) cumulée(s) → "+DOM[k][1]+"</div>"});
+ $('reco').innerHTML = n? (html||"<p style='color:#1f6f3f'>Aucune faiblesse marquée — excellent niveau incendie. Entretien : exercice d'évacuation annuel.</p>") : "<p style='color:#6b7280'>En attente de participations.</p>";
+}).catch(function(){$('rows').innerHTML="<tr><td colspan=8 style='padding:16px;color:#C01A1A'>Erreur réseau.</td></tr>"})}
+</script>
+<script>
+function genWord(){
+ if(!DATA.length){alert("Aucune donnée. Cliquez d'abord sur Actualiser.");return}
+ var n=DATA.length;var moy=Math.round(DATA.reduce(function(s,r){return s+(r.score||0)},0)/n);var best=DATA[0];
+ var tot={err_prevention:0,err_evacuation:0,err_extinction:0,err_comportement:0};DATA.forEach(function(r){for(var k in tot)tot[k]+=(r[k]||0)});
+ var ks=Object.keys(tot).sort(function(a,b){return tot[b]-tot[a]});
+ var d=new Date().toLocaleDateString('fr-FR');
+ var rowsTable=DATA.map(function(r,i){return "<tr><td>"+(i+1)+"</td><td>"+esc(r.pseudo)+"</td><td>"+esc(r.site||'')+"</td><td>"+(r.score||0)+"</td><td>"+(r.bonnes||0)+"/"+(r.total||0)+"</td><td>"+(r.erreurs||0)+"</td></tr>"}).join("");
+ var recoList=ks.filter(function(k){return tot[k]>0}).map(function(k){return "<li><b>"+DOM[k][0]+"</b> ("+tot[k]+" erreur(s) cumulée(s)) → "+DOM[k][1]+"</li>"}).join("");
+ if(!recoList)recoList="<li>Aucune faiblesse marquée. Recommandation : un exercice d'évacuation annuel et une formation Manipulation des extincteurs / EPI.</li>";
+ var html="<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'><head><meta charset='utf-8'><style>body{font-family:Calibri,Arial;color:#222} h1{color:#ef7d00} h2{color:#b35900;border-bottom:2px solid #ef7d00;padding-bottom:3px} table{border-collapse:collapse;width:100%} td,th{border:1px solid #999;padding:6px;font-size:11pt} th{background:#ef7d00;color:#1a1a1a}</style></head><body>";
+ html+="<h1>Synthèse Sécurité Incendie — RÉFLEXE FEU</h1>";
+ html+="<p><b>Date d'édition :</b> "+d+"<br><b>Réalisé par :</b> ANDRAGOPS Académie — andragops-academie.fr — 07 59 73 82 72</p>";
+ html+="<h2>1. Participation</h2><p>Nombre de parties jouées : <b>"+n+"</b><br>Score moyen : <b>"+moy+" points</b><br>Meilleur score : <b>"+(best.score||0)+" points</b> ("+esc(best.pseudo)+")</p>";
+ html+="<h2>2. Classement</h2><table><tr><th>#</th><th>Pseudo</th><th>Site/service</th><th>Score</th><th>Bonnes</th><th>Erreurs</th></tr>"+rowsTable+"</table>";
+ html+="<h2>3. Analyse par thème incendie</h2><p>Répartition des erreurs cumulées et actions de formation recommandées :</p><ul>"+recoList+"</ul>";
+ html+="<h2>4. Recommandation ANDRAGOPS</h2><p>Sur la base de ce diagnostic ludique, nous recommandons une formation incendie ciblée en présentiel : <b>Manipulation des extincteurs</b>, <b>Équipier de Première Intervention (EPI)</b> et un <b>exercice d'évacuation</b>. Organisme certifié Qualiopi — prise en charge OPCO possible. Déplacement inclus 50 km autour de Strasbourg (Benfeld compris).</p>";
+ html+="<p style='margin-top:18px;color:#888;font-size:10pt'>Document généré automatiquement à partir des résultats du jeu. Bilan indicatif, non certifiant.</p></body></html>";
+ var blob=new Blob(['﻿'+html],{type:'application/msword'});
+ var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download="Synthese_Incendie_Reflexe-Feu.doc";document.body.appendChild(a);a.click();document.body.removeChild(a);
+}
+var LK=['err_prevention','err_evacuation','err_extinction','err_comportement'];
+var LL={err_prevention:'Prévention',err_evacuation:'Évac./alerte',err_extinction:'Extinction',err_comportement:'Comportement'};
+function populateRadSel(){var s=$('radSel');if(!s)return;var cur=s.value;s.innerHTML="<option value='all'>Tous les joueurs (cumul)</option>"+DATA.map(function(r,i){return "<option value='"+i+"'>"+esc(r.pseudo||('Joueur '+(i+1)))+"</option>"}).join("");if(cur)s.value=cur;}
+function drawLac(){var sel=$('radSel')?$('radSel').value:'all';var v={};LK.forEach(function(k){v[k]=0});
+ if(sel==='all'){DATA.forEach(function(r){LK.forEach(function(k){v[k]+=(r[k]||0)})});}else{var r=DATA[parseInt(sel,10)]||{};LK.forEach(function(k){v[k]=(r[k]||0)});}
+ var max=Math.max(1,Math.max.apply(null,LK.map(function(k){return v[k]})));
+ var c=$('radL');if(!c)return;var x=c.getContext('2d'),cx=210,cy=210,R=150,n=LK.length;x.clearRect(0,0,420,420);
+ var ang=[];for(var k=0;k<n;k++)ang.push(-Math.PI/2+2*Math.PI*k/n);
+ x.strokeStyle='#d6dbe4';for(var g=1;g<=4;g++){x.beginPath();for(var k=0;k<n;k++){var rr=R*g/4,px=cx+rr*Math.cos(ang[k]),py=cy+rr*Math.sin(ang[k]);k?x.lineTo(px,py):x.moveTo(px,py)}x.closePath();x.stroke()}
+ x.strokeStyle='#c2c9d4';for(var k=0;k<n;k++){x.beginPath();x.moveTo(cx,cy);x.lineTo(cx+R*Math.cos(ang[k]),cy+R*Math.sin(ang[k]));x.stroke()}
+ x.beginPath();for(var k=0;k<n;k++){var rr=R*(v[LK[k]]/max),px=cx+rr*Math.cos(ang[k]),py=cy+rr*Math.sin(ang[k]);k?x.lineTo(px,py):x.moveTo(px,py)}x.closePath();x.fillStyle='rgba(239,125,0,.32)';x.fill();x.strokeStyle='#ef7d00';x.lineWidth=2;x.stroke();
+ x.fillStyle='#1d2330';x.font='13px Arial';x.textAlign='center';for(var k=0;k<n;k++){var lx=cx+(R+30)*Math.cos(ang[k]),ly=cy+(R+30)*Math.sin(ang[k])+4;x.fillText(LL[LK[k]]+' ('+v[LK[k]]+')',lx,ly)}
+ var sum=LK.reduce(function(s,k){return s+v[k]},0);var worst=LK.slice().sort(function(a,b){return v[b]-v[a]})[0];
+ $('radLegend').innerHTML = sum? ("<div class='reco'>Thème le plus en difficulté : <b>"+LL[worst]+"</b> — "+v[worst]+" erreur(s). Formation prioritaire conseillée.</div>") : "<p style='color:#1f6f3f'>Aucune erreur enregistrée — radar vierge, excellents réflexes.</p>";
+}
+function showTab(t){var s=(t==='S');$('paneS').className='pane'+(s?' show':'');$('paneR').className='pane'+(s?'':' show');$('tabBtnS').className='tab'+(s?' active':'');$('tabBtnR').className='tab green'+(s?'':' active');if(!s){populateRadSel();drawLac();}}
+refreshState();setInterval(refreshState,30000);
+setInterval(charger,30000);charger();
+</script></body></html>
