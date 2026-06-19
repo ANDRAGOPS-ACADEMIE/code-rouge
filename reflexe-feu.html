@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RÉFLEXE FEU — ANDRAGOPS</title>
+<style>
+:root{--r:#C01A1A;--v:#1f8a4c;--o:#ef7d00}*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Arial,sans-serif}
+body{background:#111;color:#eee;min-height:100vh;padding:16px}.app{width:100%;max-width:760px;margin:0 auto}
+header{display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid var(--o);padding-bottom:10px;margin-bottom:14px}
+.logo{font-weight:800;letter-spacing:1px;font-size:15px}.logo span{color:var(--o)}
+.hud{display:flex;gap:10px;align-items:center}
+.score{font-size:14px;color:var(--o);font-weight:700}
+.chrono{font-size:26px;font-weight:800;background:#000;padding:5px 12px;border-radius:8px;border:2px solid var(--o);font-variant-numeric:tabular-nums}
+.chrono.warn{animation:blink .6s steps(2) infinite}
+.card{background:#1d1d1d;border:1px solid #333;border-radius:12px;padding:20px;margin-bottom:12px}
+.brand{display:block;margin:4px auto 12px;width:120px;max-width:42%;height:auto}
+h1{color:var(--o);font-size:24px;margin-bottom:8px}h2{font-size:18px;margin-bottom:8px}p{line-height:1.5;margin-bottom:9px;color:#ddd}
+.pitch{font-style:italic;border-left:4px solid var(--o);padding-left:12px;color:#f0e6c8}
+.tag{display:inline-block;background:var(--o);color:#1a1a1a;font-weight:700;padding:3px 11px;border-radius:20px;font-size:12px;margin-bottom:8px}
+.tag.enig{background:#6b21a8;color:#fff}
+.scene{font-size:17px;color:#fff;margin-bottom:6px}
+.go{font-size:60px;font-weight:900;color:var(--o);text-align:center;padding:18px 0}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}@media(max-width:560px){.actions{grid-template-columns:1fr}}
+button.act{background:#2a2a2a;border:1px solid #444;color:#eee;padding:13px;border-radius:10px;text-align:left;cursor:pointer;font-size:14px}
+button.act:hover{border-color:var(--o)}button.act:disabled{opacity:.4;cursor:default}
+.big{background:var(--o);color:#1a1a1a;border:none;padding:14px 24px;border-radius:10px;font-size:16px;font-weight:800;cursor:pointer;width:100%}
+input,select{width:100%;padding:11px;border-radius:8px;border:1px solid #444;background:#161616;color:#eee;margin-bottom:10px;font-size:15px}
+label{font-size:13px;color:#aaa;display:block;margin-bottom:4px}
+.fb{margin-top:12px;padding:11px;border-radius:8px;font-weight:600}.ok{background:#16331f;color:#7be0a0;border:1px solid var(--v)}.ko{background:#3a1414;color:#ff9a9a;border:1px solid var(--r)}
+.meta{display:flex;gap:16px;font-size:13px;color:#aaa;margin-top:6px}.bar{height:8px;background:#333;border-radius:6px;overflow:hidden;margin-top:8px}.bar>i{display:block;height:100%;background:var(--o);width:0}
+.verdict{text-align:center;padding:26px}.code{font-size:28px;font-weight:900}.medal{font-size:54px}
+.reco{background:#241a1a;border:1px solid var(--o);border-radius:10px;padding:12px;margin-top:9px;text-align:left}.reco b{color:var(--o)}.hide{display:none}
+footer{text-align:center;color:#777;font-size:11px;margin-top:14px}
+#splash{position:fixed;inset:0;background:radial-gradient(circle at 50% 40%,#241200,#070707);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;text-align:center;transition:opacity .8s;padding:20px}
+#splash.out{opacity:0;pointer-events:none}
+#splash img{width:170px;max-width:50%;height:auto}
+#splash .stitle{color:#fff;font-size:28px;font-weight:900;letter-spacing:2px;margin-top:16px}#splash .stitle b{color:var(--o)}
+#splash .stag{color:#bbb;margin-top:6px}
+#splash .skip{margin-top:20px;color:#1a1a1a;font-size:14px;background:var(--o);border:none;padding:10px 20px;border-radius:8px;cursor:pointer;font-weight:700}
+.board-ov{position:fixed;inset:0;background:rgba(8,8,8,.94);z-index:900;display:flex;align-items:flex-start;justify-content:center;padding:24px;overflow:auto}
+.board-ov.hide{display:none}
+.board-card{background:#1d1d1d;border:1px solid #333;border-radius:14px;padding:20px;max-width:560px;width:100%}
+.brow{display:flex;align-items:center;gap:10px;padding:11px 12px;border-bottom:1px solid #2c2c2c}
+.brow b{color:#fff}.brank{color:var(--o);font-weight:800;min-width:34px;font-size:17px}.bscore{color:#7be0a0;font-weight:700;white-space:nowrap}
+@keyframes blink{50%{opacity:.3}}
+</style></head><body>
+<div id="splash" onclick="hideSplash()"><img src="logo.png" alt="ANDRAGOPS"><div class="stitle">RÉFLEXE <b>FEU</b></div><div class="stag">15 situations incendie · sauras-tu réagir ?</div><button class="skip" onclick="hideSplash()">Commencer ▶</button></div>
+<div class="app">
+<header><div class="logo">RÉFLEXE <span>FEU</span></div><div class="hud"><span id="score" class="score hide">0 pts</span><div id="chrono" class="chrono hide">--:--</div></div></header>
+<div id="intro" class="card"><img class="brand" src="logo.png" alt="ANDRAGOPS Académie"><span class="tag">DÉFI INCENDIE · INDIVIDUEL</span>
+<h1>Un feu vient de se déclarer. Et toi, tu fais quoi ?</h1>
+<p class="pitch">15 situations du quotidien face au feu : alarme, évacuation, extincteur, prévention. À chaque étape, choisis le bon réflexe. Les bonnes réponses rapportent des points, les erreurs coûtent du temps. Décroche le badge RÉFLEXE FEU et grimpe au classement ! 🔥</p>
+<input id="pseudo" placeholder="Ton pseudo (ex: TitanDuFeu, Marie67…)" maxlength="24">
+<input id="site" placeholder="Site / service (ex: Atelier B) — facultatif">
+<label>Durée de la partie (compte à rebours)</label>
+<select id="duree"><option value="8">8 minutes (express)</option><option value="10" selected>10 minutes (recommandé)</option><option value="12">12 minutes</option><option value="15">15 minutes (détendu)</option></select>
+<button class="big" onclick="launch()">▶ Commencer à jouer</button>
+<button class="big" style="background:#2a2a2a;color:#fff;border:1px solid var(--o);margin-top:8px" onclick="showBoard()">🏆 Voir le classement</button></div>
+<div id="game" class="card hide"><span id="tag" class="tag"></span><h2 id="titre"></h2><p id="scene" class="scene"></p>
+<div class="bar"><i id="prog"></i></div><div class="meta"><span id="obj"></span><span id="err">Erreurs : 0</span></div>
+<div id="acts" class="actions"></div><div id="fb" class="fb hide"></div></div>
+<div id="fin" class="card verdict hide"></div>
+<div id="boardScreen" class="board-ov hide"><div class="board-card">
+<h2 style="color:var(--o)">🏆 Classement RÉFLEXE FEU</h2>
+<p style="color:#aaa;font-size:13px;margin-bottom:8px">Le tableau d'honneur. Seuls les scores sont affichés.</p>
+<div id="boardList">Chargement…</div>
+<button class="big" style="margin-top:14px" onclick="closeBoard()">← Retour</button>
+</div></div>
+<footer>ANDRAGOPS Académie · andragops-academie.fr · Outil de sensibilisation, non certifiant.</footer></div>
+<script>
+var API="https://eumviuptmyzgftrqpape.supabase.co/functions/v1/feu";
+function hideSplash(){var s=document.getElementById('splash');if(s){s.classList.add('out');setTimeout(function(){s.style.display='none'},800)}}
+setTimeout(hideSplash,4500);
+var S=[
+{tag:"L'ALERTE",type:"s",theme:"evacuation",titre:"L'alarme incendie retentit",scene:"L'alarme incendie sonne dans le bâtiment. Ton tout premier réflexe ?",b:["J'arrête mon activité et j'évacue par l'issue la plus proche","Je rejoins le point de rassemblement sans traîner"],p:["Je termine d'abord ce que je fais","Je récupère mes affaires dans les vestiaires","J'attends de voir si c'est un vrai feu"]},
+{tag:"ÉNIGME · FUMÉES",type:"e",theme:"comportement",titre:"Couloir enfumé",scene:"Énigme : tu dois traverser un couloir envahi par la fumée. Comment progresses-tu ?",b:["Baissé, près du sol, où l'air reste plus respirable"],p:["Debout en courant pour aller plus vite","En apnée, les yeux fermés"]},
+{tag:"L'ÉVACUATION",type:"s",theme:"comportement",titre:"Une porte chaude",scene:"En évacuant, tu trouves une porte dont la poignée est brûlante. Tu…",b:["Je ne l'ouvre pas (le feu est derrière) et je cherche une autre issue"],p:["J'ouvre vite pour passer","Je l'ouvre doucement pour vérifier"]},
+{tag:"ÉNIGME · RÉFLEXE",type:"e",theme:"evacuation",titre:"Ce qu'on ne prend jamais",scene:"Énigme : en cas d'incendie dans un bâtiment, on ne prend JAMAIS…",b:["L'ascenseur"],p:["L'escalier","La sortie de secours"]},
+{tag:"DÉPART DE FEU",type:"s",theme:"extinction",titre:"Une corbeille s'enflamme",scene:"Petit départ de feu sur une corbeille à papier près de toi. Tu…",b:["Je donne l'alerte","J'attaque le feu avec un extincteur adapté si je sais m'en servir","Si le feu est trop grand ou si je doute, j'évacue"],p:["J'essaie de l'étouffer à mains nues","Je l'ignore, quelqu'un s'en occupera"]},
+{tag:"ÉNIGME · EXTINCTEUR",type:"e",theme:"extinction",titre:"Feu électrique",scene:"Énigme : un feu sur un appareil électrique sous tension. Quel extincteur ?",b:["CO2 (dioxyde de carbone)"],p:["À eau","À mousse"]},
+{tag:"ÉNIGME · CLASSE DE FEU",type:"e",theme:"extinction",titre:"Feu de papier",scene:"Énigme : un feu de papier, bois ou carton appartient à la classe…",b:["Classe A"],p:["Classe B (liquides)","Classe C (gaz)"]},
+{tag:"ÉNIGME · TRIANGLE DU FEU",type:"e",theme:"extinction",titre:"Les 3 ingrédients du feu",scene:"Énigme : pour qu'un feu existe, il faut réunir…",b:["Un combustible + un comburant (oxygène) + une énergie d'activation"],p:["Du feu + de l'eau + de l'air","De la fumée + de la chaleur + de la lumière"]},
+{tag:"ATTAQUE DU FEU",type:"s",theme:"extinction",titre:"Tu prends l'extincteur",scene:"Tu utilises un extincteur sur un feu naissant. Les bons gestes ?",b:["Je vise la base des flammes par mouvements de balayage","Je garde toujours une issue de sortie derrière moi"],p:["Je vise le haut des flammes","Je vise le cœur de la fumée"]},
+{tag:"POINT DE RASSEMBLEMENT",type:"s",theme:"evacuation",titre:"Une fois dehors",scene:"Tu arrives au point de rassemblement. Tu…",b:["Je reste sur place et je signale toute personne manquante","J'attends le feu vert des secours / du responsable pour rentrer"],p:["Je retourne chercher un collègue moi-même","Je rentre récupérer mes affaires"]},
+{tag:"PRÉVENTION",type:"s",theme:"prevention",titre:"À ton poste de travail",scene:"Pour éviter un départ de feu à ton poste, tu…",b:["Je ne surcharge pas les prises (pas de multiprises en cascade)","Je tiens les produits inflammables loin des sources de chaleur"],p:["Je laisse des cartons s'entasser près des machines","Je cale un extincteur derrière du matériel"]},
+{tag:"ÉNIGME · ISSUE DE SECOURS",type:"e",theme:"prevention",titre:"Une issue de secours, c'est…",scene:"Énigme : une issue de secours doit toujours être…",b:["Dégagée, signalée et ouvrable de l'intérieur sans clé"],p:["Fermée à clé pour la sécurité","Dégagée seulement la journée"]},
+{tag:"SUR SOI",type:"s",theme:"comportement",titre:"Tes vêtements prennent feu",scene:"Tes vêtements prennent feu. Le bon réflexe ?",b:["Je m'arrête, je me couche au sol et je roule pour étouffer les flammes"],p:["Je cours chercher de l'aide","J'agite les bras pour disperser les flammes"]},
+{tag:"ÉNIGME · ALERTE",type:"e",theme:"evacuation",titre:"Qui appeler ?",scene:"Énigme : en France, le numéro des sapeurs-pompiers est le…",b:["18 (ou le 112, numéro d'urgence européen)"],p:["15 (SAMU)","17 (Police)"]},
+{tag:"PRÉVENTION · MATÉRIEL",type:"s",theme:"prevention",titre:"Un extincteur suspect",scene:"Tu repères un extincteur au scellé cassé ou au manomètre dans le rouge. Tu…",b:["Je le signale pour vérification / remplacement"],p:["Je le laisse, ça ira","Je le déclenche pour tester"]}
+];
+<script>
+var KO=["Aïe, mauvais réflexe face au feu ! -40 s 🔥","Raté — le feu en profite. -40 s","Mauvais choix, on perd 40 s ⏱️","Oups ! On apprend, mais -40 s 😅"];
+var OKL=["Bon réflexe ! 🎯","Bien vu ! ✅","Réflexe de pro 👏","Parfait."];
+var t=600,T0=600,idx=0,faits=0,pts=0,erreurs=0,bonnes=0,et={prevention:0,evacuation:0,extinction:0,comportement:0},timer=null,PS="",SI="",started=false;
+function $(i){return document.getElementById(i)}
+function fmt(s){if(s<0)s=0;var m=Math.floor(s/60),x=s%60;return (m<10?'0':'')+m+':'+(x<10?'0':'')+x}
+function rnd(a){return a[Math.floor(Math.random()*a.length)]}
+function launch(){
+  if(window.GAMEOPEN===false){alert("Le jeu est fermé pour le moment. Reviens quand l'animateur l'aura ouvert.");return;}
+  PS=$('pseudo').value||'Anonyme';SI=$('site').value||'';
+  T0=t=parseInt($('duree').value,10)*60;
+  $('intro').classList.add('hide');$('game').classList.remove('hide');
+  $('chrono').classList.remove('hide');$('score').classList.remove('hide');$('chrono').textContent=fmt(t);
+  $('tag').textContent='PRÊT ?';$('tag').className='tag';$('titre').textContent='Le défi démarre…';$('acts').innerHTML='';$('fb').classList.add('hide');$('obj').textContent='';
+  var seq=['3','2','1','GO !'],k=0;$('scene').innerHTML='<div class="go">'+seq[0]+'</div>';
+  var iv=setInterval(function(){k++;if(k<seq.length){$('scene').innerHTML='<div class="go">'+seq[k]+'</div>';}else{clearInterval(iv);beginGame();}},800);
+  setTimeout(function(){try{clearInterval(iv)}catch(e){}if(!started)beginGame();},4500);
+}
+function beginGame(){if(started)return;started=true;timer=setInterval(tick,1000);load();}
+function tick(){t--;$('chrono').textContent=fmt(t);if(t<=60)$('chrono').classList.add('warn');if(t<=0){clearInterval(timer);fin()}}
+function load(){var a=S[idx];faits=0;$('tag').textContent=a.tag+'  ·  '+(idx+1)+'/'+S.length;$('tag').className='tag'+(a.type==='e'?' enig':'');$('titre').textContent=a.titre;$('scene').textContent=a.scene;$('obj').textContent=(a.type==='e'?'Trouve la bonne réponse':'Bons réflexes : 0/'+a.b.length);$('prog').style.width='0%';$('fb').classList.add('hide');var o=a.b.map(function(x){return{t:x,ok:true}}).concat(a.p.map(function(x){return{t:x,ok:false}}));for(var z=o.length-1;z>0;z--){var w=Math.floor(Math.random()*(z+1)),tt=o[z];o[z]=o[w];o[w]=tt;}var bx=$('acts');bx.innerHTML='';o.forEach(function(it){var b=document.createElement('button');b.className='act';b.textContent=it.t;b.onclick=function(){pick(b,it,a)};bx.appendChild(b)})}
+function pick(btn,it,a){var f=$('fb');f.classList.remove('hide');if(it.ok){btn.disabled=true;faits++;pts+=(a.type==='e'?120:40);$('score').textContent=pts+' pts';f.className='fb ok';f.textContent=rnd(OKL);if(a.type!=='e')$('obj').textContent='Bons réflexes : '+faits+'/'+a.b.length;$('prog').style.width=Math.round(faits/a.b.length*100)+'%';if(faits>=a.b.length){bonnes++;setTimeout(next,500)}}else{btn.disabled=true;erreurs++;if(et[a.theme]!=null)et[a.theme]++;pts=Math.max(0,pts-25);$('score').textContent=pts+' pts';t-=40;$('chrono').textContent=fmt(t);$('err').textContent='Erreurs : '+erreurs;f.className='fb ko';f.textContent=rnd(KO)}}
+function next(){idx++;if(idx>=S.length){clearInterval(timer);fin()}else{load()}}
+function fin(){clearInterval(timer);$('game').classList.add('hide');$('intro').classList.add('hide');var el=$('fin');el.classList.remove('hide');
+var fini=idx>=S.length;var bonus=Math.max(0,t);var score=Math.max(0,pts+bonus);
+var medal,grade,col;if(!fini){medal='⏰';grade='TEMPS ÉCOULÉ';col='#C01A1A'}else if(erreurs<=2){medal='🥇';grade='BADGE OR — RÉFLEXE FEU PARFAIT';col='#ef7d00'}else if(erreurs<=5){medal='🥈';grade='BADGE ARGENT — SOLIDE';col='#cfd3d6'}else{medal='🥉';grade='BADGE BRONZE — À CONSOLIDER';col='#cd7f32'}
+var reco='';
+if(et.evacuation>0)reco+="<div class='reco'><b>Évacuation / alerte :</b> des réflexes à revoir. → exercice d'évacuation + consignes.</div>";
+if(et.extinction>0)reco+="<div class='reco'><b>Extincteurs / attaque du feu :</b> à renforcer. → <b>Manipulation des extincteurs</b> / <b>EPI</b>.</div>";
+if(et.prevention>0)reco+="<div class='reco'><b>Prévention :</b> quelques points à corriger. → sensibilisation prévention incendie.</div>";
+if(et.comportement>0)reco+="<div class='reco'><b>Comportement face au feu :</b> bons réflexes à ancrer. → mise en situation pratique.</div>";
+if(!reco)reco="<div class='reco'>Sans-faute ! Excellents réflexes incendie. Pour entretenir : un exercice d'évacuation par an et une formation EPI.</div>";
+el.innerHTML="<div class='medal'>"+medal+"</div><div class='code' style='color:"+col+"'>"+grade+"</div><h2 style='margin-top:10px'>Score : "+score+" points</h2><p>Joueur : <b>"+PS+"</b>"+(SI?" · "+SI:"")+"<br>Bonnes étapes : <b>"+bonnes+"/"+S.length+"</b> · Erreurs : <b>"+erreurs+"</b> · Temps restant : <b>"+fmt(Math.max(t,0))+"</b></p><h2>Ton bilan</h2>"+reco+"<p id='envoye' style='color:#aaa;margin-top:10px'>Envoi du score…</p><p style='color:#888;font-size:12px;margin-top:6px'>« Le jeu ouvre les yeux ; la formation, sur le terrain comme en salle, sauve des vies. »</p><button class='big' style='margin-top:14px' onclick='showBoard()'>🏆 Voir le classement</button>";
+send(score);}
+function send(score){fetch(API,{method:'POST',body:JSON.stringify({pseudo:PS,site:SI,score:score,temps_total:T0,temps_restant:Math.max(t,0),erreurs:erreurs,bonnes:bonnes,total:S.length,err_prevention:et.prevention,err_evacuation:et.evacuation,err_extinction:et.extinction,err_comportement:et.comportement})}).then(function(){$('envoye').textContent='✔ Score transmis au classement.'}).catch(function(){$('envoye').textContent='(score non transmis — réseau)'})}
+function be(s){return String(s==null?'':s).replace(/[&<>]/g,function(c){return c=='&'?'&amp;':c=='<'?'&lt;':'&gt;'})}
+function showBoard(){var ov=$('boardScreen');ov.classList.remove('hide');var L=$('boardList');L.innerHTML='Chargement…';
+ fetch(API+"?board=1&z="+Date.now()).then(function(r){return r.json()}).then(function(rows){
+  if(!Array.isArray(rows)||!rows.length){L.innerHTML="<p style='color:#aaa'>Aucun joueur au classement pour le moment. Sois le premier !</p>";return}
+  var med=["🥇","🥈","🥉"];
+  L.innerHTML=rows.map(function(r,i){return "<div class='brow'><span class='brank'>"+(i<3?med[i]:(i+1))+"</span><b style='flex:1'>"+be(r.pseudo||'(joueur)')+(r.site?" <span style='color:#888;font-weight:400'>· "+be(r.site)+"</span>":"")+"</b><span class='bscore'>"+(r.score||0)+" pts</span></div>"}).join("");
+ }).catch(function(){L.innerHTML="<p style='color:#ff9a9a'>Classement indisponible (réseau).</p>"});
+}
+function closeBoard(){$('boardScreen').classList.add('hide');}
+window.GAMEOPEN=true;
+function feuClosed(){var i=$('intro');if(i){i.innerHTML="<img class='brand' src='logo.png' alt='ANDRAGOPS'><span class='tag'>JEU FERMÉ</span><h1>RÉFLEXE FEU n'est pas ouvert pour le moment</h1><p>Reviens quand ton animateur l'aura ouvert. 🔒</p>";}}
+fetch(API+"?state=1&z="+Date.now()).then(function(r){return r.json()}).then(function(j){if(j&&j.open===false){window.GAMEOPEN=false;feuClosed();}}).catch(function(){});
+</script></body></html>
