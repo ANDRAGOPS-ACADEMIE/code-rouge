@@ -107,8 +107,8 @@ add_cover(
     [
         "Échange téléphonique avec la Responsable RH",
         "Formations prévention & santé-sécurité au travail + cohésion d'équipe",
-        "Angle : sur-mesure & ancrage local (Hauts-de-France)",
-        "Contact : +33 (0)6 35 25 89 22 — Wervicq-Sud (59)",
+        "Atout d'entrée : recommandation de confiance (via votre frère) + expertise INRS/Qualiopi",
+        "RH à contacter : +33 (0)6 35 25 89 22 — COUSIN GROUP, Wervicq-Sud (59)",
         "",
         "Guide préparé le 19 juin 2026",
     ],
@@ -121,7 +121,8 @@ para(doc, "Échange de découverte : présenter brièvement ANDRAGOPS, faire par
           "est en grande partie une obligation réglementaire : c'est un levier de vente puissant.")
 add_table(doc, ["Élément", "Repère"], [
     ["But de l'appel", "Qualifier les besoins SST/prévention, décrocher un RDV de cadrage"],
-    ["Ce que je vends", "Formations sécurité obligatoires/recommandées + cohésion, en sur-mesure et local"],
+    ["Ce que je vends", "Formations sécurité obligatoires/recommandées + cohésion, en sur-mesure"],
+    ["Atout d'entrée", "Recommandation via votre frère (lead chaud) + Qualiopi & formateurs SST INRS"],
     ["Posture", "Expert-conseil prévention (80 % écoute / 20 % parole)"],
     ["Résultat visé", "Un audit de leurs besoins sécurité + une proposition chiffrée"],
 ], [2.0, 4.3])
@@ -168,16 +169,18 @@ bullet(doc, "**Cohésion** : une maison familiale de 175 ans, en croissance et q
 
 # 4. Pitch
 h1(doc, "4. Pitch ANDRAGOPS (30–60 secondes)")
-script_line(doc, "Accroche :", "Bonjour, [Prénom Nom], d'ANDRAGOPS Académie. Merci de me consacrer "
-            "quelques minutes. On accompagne les entreprises industrielles sur la sécurité et la prévention "
-            "des risques au travail.")
+script_line(doc, "Accroche :", "Bonjour, [Prénom Nom], d'ANDRAGOPS Académie. C'est [prénom de votre frère] "
+            "qui m'a parlé de vous — merci de prendre le temps. On accompagne les entreprises industrielles "
+            "sur la sécurité et la prévention des risques au travail.")
 script_line(doc, "Qui :", "Concrètement, on forme vos équipes au secourisme (SST), aux gestes et postures, "
-            "à la PRAP, à l'incendie — et on propose aussi des activités de cohésion. Le tout en sur-mesure "
-            "et en proximité, ici dans les Hauts-de-France.")
-script_line(doc, "Pourquoi vous :", "Avec un site comme le vôtre, il y a forcément des obligations à tenir "
-            "(secouristes, évacuation, prévention des TMS) — et c'est exactement notre métier.")
+            "à la PRAP, à l'incendie — et on propose aussi des activités de cohésion. Organisme certifié "
+            "Qualiopi, formateurs SST INRS, avec 80 % de pratique : on forme pour agir, pas pour tamponner.")
+script_line(doc, "Pourquoi vous :", "Avec un site industriel comme le vôtre, il y a forcément des obligations à "
+            "tenir (secouristes, évacuation, prévention des TMS) — et c'est exactement notre métier.")
 script_line(doc, "Transition :", "Avant de vous en dire plus, j'aimerais comprendre où vous en êtes "
             "aujourd'hui sur ces sujets. Je peux vous poser quelques questions ?")
+para(doc, "Astuce : la recommandation de votre frère est votre meilleure carte d'entrée — placez-la dès "
+          "l'accroche, elle ouvre la confiance et fait oublier la distance.")
 para(doc, "Votre version personnalisée :"); fill_lines(doc, 3)
 
 # 5. Questions de découverte
@@ -199,12 +202,15 @@ bullet(doc, "Qui décide des formations sécurité ? Avez-vous un budget mobilis
 
 # 6. Arguments
 h1(doc, "6. Vos arguments différenciants")
+bullet(doc, "**Recommandation de confiance** : vous arrivez par votre frère, pas à froid — capitalisez sur ce lien.")
 bullet(doc, "**Obligation = priorité** : la sécurité n'est pas une option, c'est la loi — vous les aidez à être en règle.")
 bullet(doc, "**Sur-mesure** : formations bâties sur LEURS postes réels (atelier de tressage, manutention de bobines, salle blanche).")
-bullet(doc, "**Local & réactif** : intervention sur site à Wervicq-Sud, planning calé sur la production, interlocuteur unique.")
+bullet(doc, "**Expertise reconnue** : organisme **Qualiopi**, formateurs **SST INRS**, méthode C.A.D.R, 80 % de pratique.")
+bullet(doc, "**Distance maîtrisée** : on vient sur site en **intra**, en regroupant plusieurs sessions sur 2-3 jours "
+            "consécutifs pour optimiser le déplacement — vous formez beaucoup de monde en une seule venue.")
 bullet(doc, "**Approche globale** : un seul partenaire pour SST, gestes & postures, PRAP, incendie ET cohésion.")
-bullet(doc, "**Récurrence maîtrisée** : suivi des recyclages MAC SST → vous ne ratez jamais une échéance.")
-bullet(doc, "**Financement** : [si Qualiopi] prise en charge possible via l'OPCO et le plan de développement des compétences.")
+bullet(doc, "**Récurrence maîtrisée** : packs annuels + suivi des recyclages MAC SST → vous ne ratez jamais une échéance.")
+bullet(doc, "**Financement** : organisme Qualiopi → prise en charge possible via l'OPCO et le plan de développement des compétences.")
 
 # 7. Objections
 h1(doc, "7. Objections fréquentes & réponses")
@@ -223,6 +229,11 @@ add_objection(doc, "C'est un budget en plus.",
 add_objection(doc, "Envoyez-moi une plaquette.",
               "« Je vous l'envoie. Mais le plus utile serait 30 min pour faire le point sur vos obligations "
               "réelles, et je reviens avec une proposition ciblée. On se cale un créneau ? »")
+add_objection(doc, "Mais vous êtes en Alsace, c'est loin / les frais de route ?",
+              "« C'est juste, on est basé à Strasbourg. On gère ça simplement : on intervient en intra en "
+              "regroupant plusieurs sessions sur 2-3 jours, donc un seul déplacement pour former beaucoup de "
+              "monde. Les frais sont transparents et intégrés au devis — et au final le coût par stagiaire reste "
+              "compétitif. L'important, c'est la qualité de la formation et le fait qu'on se connaisse déjà. »")
 
 # 8. Financement
 h1(doc, "8. Financement (bon à savoir)")
@@ -242,9 +253,11 @@ bullet(doc, "Reformulez les besoins entendus avant de raccrocher.")
 
 # 10. Check-list + notes
 h1(doc, "10. Check-list avant l'appel")
-bullet(doc, "Dossier de recherche COUSIN GROUP + ce guide sous les yeux.")
+bullet(doc, "Citer **votre frère** dès l'accroche (« c'est [prénom] qui m'a parlé de vous »).")
+bullet(doc, "Dossier de recherche COUSIN GROUP + ce guide + le catalogue sous les yeux.")
 bullet(doc, "Mes tarifs/durées par formation + 1 exemple de client industriel satisfait.")
-bullet(doc, "Mes créneaux de RDV disponibles.")
+bullet(doc, "Ma réponse prête sur la **distance** (intra groupé 2-3 jours, frais transparents).")
+bullet(doc, "Mes créneaux de RDV disponibles + contact : 07 59 73 82 72 · info@andragops-academie.com.")
 bullet(doc, "Endroit calme, bon réseau, de quoi noter, sourire (s'entend au téléphone).")
 
 h1(doc, "11. Notes de l'appel")
