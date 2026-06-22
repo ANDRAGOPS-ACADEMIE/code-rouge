@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""Construit la fiche incendie one-pager A4 avec logo intégré (data URI) et layout corrigé."""
+"""Fiche incendie A4 — ABSOLUTE positioning (pixel-perfect, robust for Express).
+Renders to PNG via weasyprint for visual verification."""
 
 logo = open('/home/user/code-rouge/logo_tiny_datauri.txt').read().strip()
 
@@ -13,303 +14,193 @@ HTML = r'''<!DOCTYPE html>
 <meta name="hz:canvas-height" content="1123" />
 <link rel="stylesheet" href="https://use.typekit.net/zlr6esn.css">
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #d9dcde; }
-
+  * { margin:0; padding:0; box-sizing:border-box; }
+  @page { size: 794px 1123px; margin: 0; }
+  body { background:#d9dcde; }
   .flyer {
-    position: relative;
-    width: 210mm;
-    height: 297mm;
-    background: #ffffff;
-    overflow: hidden;
-    font-family: "roboto", sans-serif;
-    color: #2b2f33;
-    display: flex;
-    flex-direction: column;
+    position:absolute; top:0; left:0;
+    width:794px; height:1123px; background:#ffffff; overflow:hidden;
+    font-family:"roboto","Roboto",sans-serif; color:#2b2f33;
   }
+  .abs { position:absolute; }
+  .bebas { font-family:"bebas-neue-v14-deprecated","Bebas Neue",sans-serif; }
 
-  /* top red accent rule */
-  .topbar { height: 1.6mm; background: #c0392b; flex-shrink: 0; }
+  /* bands */
+  .topbar { position:absolute; left:0; top:0; width:794px; height:6px; background:#c0392b; }
+  .stripe { position:absolute; left:0; top:98px; width:794px; height:10px; background:#e67e22; }
+  .footer { position:absolute; left:0; top:1035px; width:794px; height:88px; background:#263238; }
 
-  /* ---------- HEADER (white, with logo) ---------- */
-  .header {
-    background: #ffffff;
-    height: 24mm;
-    padding: 0 12mm;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-shrink: 0;
-  }
-  .header-left { display: flex; align-items: center; gap: 5mm; }
-  .logo { height: 19mm; width: auto; display: block; }
-  .header-tag {
-    font-size: 8.5pt; color: #56606a; line-height: 1.25; max-width: 52mm; font-weight: 500;
-    border-left: 2.4px solid #e67e22; padding-left: 3mm;
-  }
-  .header-right { text-align: right; }
-  .fiche-label {
-    font-family: "bebas-neue-v14-deprecated", sans-serif;
-    font-size: 21pt; letter-spacing: 1px; line-height: 1; color: #c0392b;
-  }
-  .fiche-ref { font-size: 7.5pt; color: #6a727a; margin-top: 1mm; }
+  /* header */
+  .logo { position:absolute; left:44px; top:22px; width:60px; height:56px; }
+  .htag { position:absolute; left:120px; top:34px; width:236px; height:34px;
+          border-left:3px solid #e67e22; padding-left:11px;
+          font-size:11px; line-height:1.3; color:#56606a; font-weight:500; display:flex; align-items:center; }
+  .flabel { position:absolute; right:44px; top:30px; width:320px; text-align:right;
+            font-size:28px; line-height:1; color:#c0392b; letter-spacing:1px; }
+  .fref { position:absolute; right:44px; top:64px; width:320px; text-align:right;
+          font-size:10px; color:#6a727a; }
 
-  .stripe { height: 2.5mm; background: #e67e22; flex-shrink: 0; }
+  /* title */
+  .eyebrow { position:absolute; left:44px; top:122px; height:18px;
+             border-left:3px solid #e67e22; padding-left:11px;
+             font-size:16px; line-height:18px; color:#c0392b; letter-spacing:2px; }
+  .h1 { position:absolute; left:44px; top:146px; width:706px;
+        font-size:35px; line-height:0.98; color:#263238; letter-spacing:.5px; }
+  .subtitle { position:absolute; left:44px; top:226px; width:706px;
+              font-size:13px; color:#56606a; font-weight:500; }
 
-  /* ---------- TITLE ---------- */
-  .title-zone { padding: 5mm 12mm 2mm; flex-shrink: 0; }
-  .eyebrow {
-    display: inline-block;
-    font-family: "bebas-neue-v14-deprecated", sans-serif;
-    font-size: 12.5pt; letter-spacing: 2px;
-    color: #c0392b;
-    border-left: 3px solid #e67e22;
-    padding-left: 3mm;
-  }
-  h1 {
-    font-family: "bebas-neue-v14-deprecated", sans-serif;
-    font-size: 34pt;
-    letter-spacing: .5px;
-    color: #263238;
-    line-height: .98;
-    margin-top: 2mm;
-  }
-  .subtitle { font-size: 10pt; color: #56606a; margin-top: 2mm; font-weight: 500; }
+  /* chips */
+  .chip { position:absolute; top:252px; width:134px; height:70px; background:#f2f3f4; padding:9px 10px; }
+  .chip .top { position:absolute; left:0; top:0; width:134px; height:9px; background:#263238; }
+  .chip .k { font-size:14px; color:#c0392b; letter-spacing:.5px; margin-top:4px; }
+  .chip .v { font-size:10.5px; color:#2b2f33; font-weight:500; line-height:1.25; margin-top:3px; }
 
-  /* ---------- INFO CHIPS ---------- */
-  .chips { display: flex; gap: 2mm; padding: 3mm 12mm 0; flex-shrink: 0; }
-  .chip {
-    flex: 1 1 0; min-width: 0; background: #f2f3f4; border-top: 2.6mm solid #263238;
-    padding: 2.4mm 2.6mm; min-height: 18mm;
-  }
-  .chip-k {
-    font-family: "bebas-neue-v14-deprecated", sans-serif;
-    font-size: 11pt; letter-spacing: .6px; color: #c0392b;
-  }
-  .chip-v { font-size: 8.2pt; color: #2b2f33; font-weight: 500; line-height: 1.25; margin-top: 1mm; }
-
-  /* ---------- MAIN GRID (fills remaining height) ---------- */
-  .main { display: flex; gap: 7mm; padding: 6mm 12mm 6mm; flex: 1; min-height: 0; }
-  .col-left { flex: 56 1 0; min-width: 0; display: flex; flex-direction: column; }
-  .col-right { flex: 44 1 0; min-width: 0; display: flex; flex-direction: column; }
-
-  .sec-title {
-    font-family: "bebas-neue-v14-deprecated", sans-serif;
-    font-size: 15pt; letter-spacing: .8px; color: #263238;
-    border-bottom: 1.5px solid #e2e4e6; padding-bottom: 1.2mm; margin-bottom: 3mm;
-    display: flex; align-items: center; gap: 2mm; flex-shrink: 0;
-  }
-  .sec-title::before {
-    content: ""; width: 3.2mm; height: 3.2mm; background: #c0392b; display: inline-block; border-radius: .5mm; flex-shrink: 0;
-  }
+  /* section titles */
+  .sec { position:absolute; height:24px; border-bottom:1.5px solid #e2e4e6;
+         font-size:20px; color:#263238; letter-spacing:.8px; padding-left:18px; }
+  .sec::before { content:""; position:absolute; left:0; top:3px; width:13px; height:13px; background:#c0392b; border-radius:2px; }
 
   /* objectives */
-  .obj { list-style: none; flex-shrink: 0; }
-  .obj li {
-    position: relative; font-size: 9.4pt; color: #33383d; line-height: 1.35;
-    padding: 0 0 3mm 6mm;
-  }
-  .obj li::before {
-    content: "\2713"; position: absolute; left: 0; top: 0;
-    color: #fff; background: #e67e22; width: 4.4mm; height: 4.4mm; border-radius: 50%;
-    font-size: 7.5pt; display: flex; align-items: center; justify-content: center; font-weight: 700;
-  }
-  .obj b { color: #263238; }
+  .obj { position:absolute; left:44px; width:394px; }
+  .obj .it { position:relative; padding-left:24px; margin-bottom:9px; font-size:12.5px; line-height:1.35; color:#33383d; }
+  .obj .it::before { content:"\2713"; position:absolute; left:0; top:1px; width:17px; height:17px; border-radius:50%;
+                     background:#e67e22; color:#fff; font-size:10px; text-align:center; line-height:17px; font-weight:700; }
+  .obj .it b { color:#263238; }
 
-  /* timeline — spreads to fill column height */
-  .timeline { flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 2mm 0; }
-  .step { display: flex; gap: 3.4mm; }
-  .step-time {
-    flex-shrink: 0; width: 16mm; background: #263238; color: #fff;
-    border-radius: 1.4mm; text-align: center; padding: 2mm 0;
-    display: flex; flex-direction: column; justify-content: center;
-  }
-  .step-time .min {
-    font-family: "bebas-neue-v14-deprecated", sans-serif; font-size: 17pt; line-height: .9; display: block;
-  }
-  .step-time .lbl { font-size: 6.5pt; letter-spacing: .5px; opacity: .8; }
-  .step-body { padding-top: .6mm; min-width: 0; }
-  .step-h { font-size: 10pt; font-weight: 700; color: #c0392b; }
-  .step-d { font-size: 8.4pt; color: #444a4f; line-height: 1.3; margin-top: .6mm; }
-  .step.practice .step-time { background: #c0392b; }
-  .step.practice .step-h { color: #263238; }
+  /* timeline */
+  .step { position:absolute; left:44px; width:394px; }
+  .step .badge { position:absolute; left:0; top:0; width:58px; height:52px; background:#263238; border-radius:6px;
+                 color:#fff; text-align:center; }
+  .step .badge .n { font-size:23px; line-height:1; margin-top:9px; }
+  .step .badge .u { font-size:8.5px; letter-spacing:.5px; opacity:.85; }
+  .step.red .badge { background:#c0392b; }
+  .step .b { position:absolute; left:72px; width:322px; top:0; }
+  .step .b .h { font-size:13.5px; font-weight:700; color:#c0392b; }
+  .step.red .b .h { color:#263238; }
+  .step .b .d { font-size:11px; color:#444a4f; line-height:1.3; margin-top:3px; }
+  .mnote { position:absolute; left:44px; width:394px; top:1006px; font-size:10px; color:#e67e22; font-weight:600; font-style:italic; }
 
-  .method-note {
-    font-size: 7.6pt; color: #e67e22; font-weight: 600; margin-top: 2mm; font-style: italic;
-    flex-shrink: 0;
-  }
+  /* right column */
+  .reg { position:absolute; left:458px; top:366px; width:292px; background:#f2f3f4;
+         border-left:3px solid #c0392b; padding:11px 13px; font-size:11px; color:#3a4045; line-height:1.4; }
+  .reg b { color:#263238; }
+  .cbh { position:absolute; left:458px; font-size:12px; font-weight:700; }
+  .cbl { position:absolute; left:458px; width:292px; }
+  .cbl .it { position:relative; padding-left:14px; margin-bottom:5px; font-size:11px; color:#3a4045; line-height:1.3; }
+  .cbl .it::before { content:""; position:absolute; left:0; top:5px; width:6px; height:6px; border-radius:50%; background:#c0392b; }
+  .cbl.prat .it::before { background:#e67e22; }
 
-  /* reg box */
-  .reg {
-    background: #f2f3f4; border-left: 3px solid #c0392b; padding: 3mm 3.4mm;
-    font-size: 8.2pt; color: #3a4045; line-height: 1.35; flex-shrink: 0;
-  }
-  .reg b { color: #263238; }
+  /* organisation */
+  .orga { position:absolute; left:458px; top:782px; width:292px; height:248px; background:#263238; border-radius:8px; padding:14px 16px; color:#fff; }
+  .orga .h { font-size:17px; letter-spacing:.5px; line-height:1.05; }
+  .orga .grid { position:absolute; left:16px; top:62px; width:260px; height:36px; }
+  .orga .slot { position:absolute; top:0; width:59px; height:36px; background:rgba(255,255,255,.1); border-radius:4px; text-align:center; }
+  .orga .slot .t { font-size:9px; opacity:.85; margin-top:5px; }
+  .orga .slot .s { font-size:15px; }
+  .orga .tot { position:absolute; left:16px; top:112px; width:260px; font-size:11px; line-height:1.4; }
+  .orga .tot b { color:#f0a35e; }
+  .orga .fin { position:absolute; left:16px; top:176px; width:260px; font-size:10.5px; line-height:1.4; color:#cfd4d8;
+               border-top:1px solid rgba(255,255,255,.18); padding-top:9px; }
+  .orga .fin b { color:#f0a35e; }
 
-  /* content lists */
-  .content-block { margin-top: 4mm; flex-shrink: 0; }
-  .cb-h { font-size: 9pt; font-weight: 700; color: #c0392b; margin-bottom: 1.4mm; }
-  .cb-h.prat { color: #e67e22; margin-top: 3mm; }
-  .cb { list-style: none; }
-  .cb li {
-    position: relative; font-size: 8.3pt; color: #3a4045; line-height: 1.35; padding: 0 0 1.4mm 3.6mm;
-  }
-  .cb li::before { content: ""; position: absolute; left: 0; top: 1.7mm; width: 1.6mm; height: 1.6mm; background: #c0392b; border-radius: 50%; }
-  .cb.prat li::before { background: #e67e22; }
-
-  /* organisation — pinned to bottom of right column */
-  .orga {
-    margin-top: auto; background: #263238; color: #fff; border-radius: 1.6mm; padding: 3.4mm 3.6mm;
-  }
-  .orga-h { font-family: "bebas-neue-v14-deprecated", sans-serif; font-size: 13pt; letter-spacing: .5px; }
-  .orga-grid { display: flex; gap: 1.8mm; margin: 2.4mm 0; }
-  .slot { flex: 1 1 0; min-width: 0; background: rgba(255,255,255,.1); border-radius: 1mm; text-align: center; padding: 1.8mm 0; }
-  .slot .t { font-size: 7pt; opacity: .85; }
-  .slot .s { font-family: "bebas-neue-v14-deprecated", sans-serif; font-size: 12pt; }
-  .orga-tot { font-size: 8.2pt; line-height: 1.35; }
-  .orga-tot b { color: #f0a35e; }
-
-  /* ---------- FOOTER ---------- */
-  .footer {
-    background: #263238; color: #fff; padding: 5mm 12mm; text-align: center; flex-shrink: 0;
-  }
-  .footer .f-name { font-family: "bebas-neue-v14-deprecated", sans-serif; font-size: 15pt; letter-spacing: .8px; }
-  .footer .f-role { font-size: 8pt; opacity: .85; margin-top: .4mm; }
-  .footer .f-contact { font-size: 9pt; font-weight: 500; margin-top: 2mm; color: #f3b27a; }
-  .footer .f-badges { font-size: 7.4pt; opacity: .8; margin-top: 1.8mm; letter-spacing: .3px; }
-  .footer .f-badges span { color: #e67e22; }
+  /* footer */
+  .f-name { position:absolute; left:0; top:14px; width:794px; text-align:center; font-size:20px; color:#fff; letter-spacing:.8px; }
+  .f-role { position:absolute; left:0; top:38px; width:794px; text-align:center; font-size:10.5px; color:#ffffffd9; }
+  .f-contact { position:absolute; left:0; top:56px; width:794px; text-align:center; font-size:12px; color:#f3b27a; font-weight:500; }
+  .f-badges { position:absolute; left:0; top:74px; width:794px; text-align:center; font-size:9.5px; color:#ffffffcc; }
+  .f-badges span { color:#e67e22; }
 </style>
 </head>
 <body>
-  <div class="flyer" data-canvas-width="794" data-canvas-height="1123">
-
+  <div class="flyer">
     <div class="topbar"></div>
 
-    <!-- HEADER -->
-    <div class="header">
-      <div class="header-left">
-        <img class="logo" src="__LOGO__" alt="ANDRAGOPS Académie" />
-        <div class="header-tag">Santé, sécurité au travail &amp; secours d'urgence</div>
-      </div>
-      <div class="header-right">
-        <div class="fiche-label">FICHE PROGRAMME</div>
-        <div class="fiche-ref">Réf. INC-EPI-1H30 · v1 · 06/2026</div>
-      </div>
-    </div>
+    <!-- header -->
+    <img class="logo" src="__LOGO__" alt="ANDRAGOPS" />
+    <div class="htag">Santé, sécurité au travail &amp; secours d'urgence</div>
+    <div class="flabel bebas">FICHE PROGRAMME</div>
+    <div class="fref">Réf. INC-EPI-1H30 · v1 · 06/2026</div>
     <div class="stripe"></div>
 
-    <!-- TITLE -->
-    <div class="title-zone">
-      <span class="eyebrow">SÉCURITÉ INCENDIE</span>
-      <h1>FORMATION INCENDIE — ÉQUIPIER DE PREMIÈRE INTERVENTION</h1>
-      <div class="subtitle">Manipulation des extincteurs &amp; RIA — exercices sur feux réels écologiques · Sessions de 1&nbsp;h&nbsp;30</div>
+    <!-- title -->
+    <div class="eyebrow bebas">SÉCURITÉ INCENDIE</div>
+    <div class="h1 bebas">FORMATION INCENDIE —<br/>ÉQUIPIER DE PREMIÈRE INTERVENTION</div>
+    <div class="subtitle">Manipulation des extincteurs &amp; RIA — exercices sur feux réels écologiques · Sessions de 1&nbsp;h&nbsp;30</div>
+
+    <!-- chips -->
+    <div class="chip" style="left:44px"><div class="top"></div><div class="k bebas">PUBLIC</div><div class="v">Personnel désigné (1ʳᵉ intervention)</div></div>
+    <div class="chip" style="left:186px"><div class="top"></div><div class="k bebas">DURÉE</div><div class="v">Session de 1 h 30 · intra</div></div>
+    <div class="chip" style="left:328px"><div class="top"></div><div class="k bebas">EFFECTIF</div><div class="v">8 participants max / session</div></div>
+    <div class="chip" style="left:470px"><div class="top"></div><div class="k bebas">LIEU</div><div class="v">Sur votre site (Wervicq-Sud)</div></div>
+    <div class="chip" style="left:612px"><div class="top"></div><div class="k bebas">VALIDATION</div><div class="v">Attestation + registre</div></div>
+
+    <!-- LEFT -->
+    <div class="sec bebas" style="left:44px; top:340px; width:394px;">OBJECTIFS PÉDAGOGIQUES</div>
+    <div class="obj" style="top:374px;">
+      <div class="it"><b>Identifier</b> un départ de feu et ses mécanismes (triangle du feu, classes de feux).</div>
+      <div class="it"><b>Donner l'alerte</b> et appliquer la consigne d'évacuation de l'établissement.</div>
+      <div class="it"><b>Choisir</b> l'agent extincteur adapté à la classe de feu rencontrée.</div>
+      <div class="it"><b>Utiliser</b> un extincteur et un RIA en sécurité, sur flammes réelles.</div>
     </div>
 
-    <!-- CHIPS -->
-    <div class="chips">
-      <div class="chip"><div class="chip-k">PUBLIC</div><div class="chip-v">Personnel désigné (1ʳᵉ intervention)</div></div>
-      <div class="chip"><div class="chip-k">DURÉE</div><div class="chip-v">Session de 1 h 30 · intra</div></div>
-      <div class="chip"><div class="chip-k">EFFECTIF</div><div class="chip-v">8 participants max / session</div></div>
-      <div class="chip"><div class="chip-k">LIEU</div><div class="chip-v">Sur votre site (Wervicq-Sud)</div></div>
-      <div class="chip"><div class="chip-k">VALIDATION</div><div class="chip-v">Attestation + registre de sécurité</div></div>
+    <div class="sec bebas" style="left:44px; top:520px; width:394px;">DÉROULÉ DE LA SESSION · 1 H 30</div>
+    <div class="step" style="top:556px;"><div class="badge bebas"><div class="n">10</div><div class="u">MIN</div></div><div class="b"><div class="h">Accueil &amp; cadrage</div><div class="d">Émargement, tour de table, objectifs, rappel des consignes et plans de sécurité du site.</div></div></div>
+    <div class="step" style="top:668px;"><div class="badge bebas"><div class="n">25</div><div class="u">MIN</div></div><div class="b"><div class="h">Théorie du feu</div><div class="d">Triangle du feu · classes de feux et pictogrammes · agents et procédés d'extinction · alerte, conduite à tenir et évacuation.</div></div></div>
+    <div class="step red" style="top:792px;"><div class="badge bebas"><div class="n">45</div><div class="u">MIN</div></div><div class="b"><div class="h">Pratique sur feux réels</div><div class="d">Extincteurs (eau pulvérisée, poudre, CO₂) et RIA · extinction réelle sur générateur écologique : <b>chaque participant manipule</b>.</div></div></div>
+    <div class="step" style="top:916px;"><div class="badge bebas"><div class="n">10</div><div class="u">MIN</div></div><div class="b"><div class="h">Débriefing &amp; validation</div><div class="d">Reprise des gestes · évaluation comportementale · signature du registre · remise des attestations.</div></div></div>
+    <div class="mnote">Pédagogie active — 80 % de pratique · Méthode C.A.D.R</div>
+
+    <!-- RIGHT -->
+    <div class="sec bebas" style="left:458px; top:340px; width:292px;">CADRE RÉGLEMENTAIRE</div>
+    <div class="reg"><b>Code du travail, art. R.4227-28 &amp; R.4227-39 :</b> l'employeur fournit des moyens de lutte contre l'incendie et organise, <b>au moins tous les 6 mois</b>, des exercices et essais. Le personnel doit être entraîné à manipuler extincteurs et RIA.</div>
+
+    <div class="sec bebas" style="left:458px; top:486px; width:292px;">CONTENU</div>
+    <div class="cbh" style="top:520px; color:#c0392b;">Apports théoriques</div>
+    <div class="cbl" style="top:540px;">
+      <div class="it">Consignes et plans de sécurité en place</div>
+      <div class="it">Triangle du feu : combustible, comburant, énergie</div>
+      <div class="it">Classes de feux &amp; pictogrammes</div>
+      <div class="it">Agents extincteurs et procédés d'extinction</div>
+    </div>
+    <div class="cbh" style="top:632px; color:#e67e22;">Mise en pratique</div>
+    <div class="cbl prat" style="top:652px;">
+      <div class="it">Extincteurs du site : eau, poudre, CO₂</div>
+      <div class="it">Présentation et utilisation du RIA</div>
+      <div class="it">Extinction réelle encadrée individuellement</div>
+      <div class="it">Générateur « feux propres » sans fumée</div>
     </div>
 
-    <!-- MAIN -->
-    <div class="main">
-      <!-- LEFT -->
-      <div class="col-left">
-        <div class="sec-title">OBJECTIFS PÉDAGOGIQUES</div>
-        <ul class="obj">
-          <li><b>Identifier</b> un départ de feu et ses mécanismes (triangle du feu, classes de feux).</li>
-          <li><b>Donner l'alerte</b> et appliquer la consigne d'évacuation de l'établissement.</li>
-          <li><b>Choisir</b> l'agent extincteur adapté à la classe de feu rencontrée.</li>
-          <li><b>Utiliser</b> un extincteur et un RIA en sécurité, sur flammes réelles.</li>
-        </ul>
-
-        <div class="sec-title" style="margin-top:5mm;">DÉROULÉ DE LA SESSION · 1 H 30</div>
-        <div class="timeline">
-          <div class="step">
-            <div class="step-time"><span class="min">10</span><span class="lbl">MIN</span></div>
-            <div class="step-body">
-              <div class="step-h">Accueil &amp; cadrage</div>
-              <div class="step-d">Émargement, tour de table, objectifs, rappel des consignes et plans de sécurité du site.</div>
-            </div>
-          </div>
-          <div class="step">
-            <div class="step-time"><span class="min">25</span><span class="lbl">MIN</span></div>
-            <div class="step-body">
-              <div class="step-h">Théorie du feu</div>
-              <div class="step-d">Triangle du feu · classes de feux et pictogrammes · agents et procédés d'extinction · alerte, conduite à tenir et évacuation.</div>
-            </div>
-          </div>
-          <div class="step practice">
-            <div class="step-time"><span class="min">45</span><span class="lbl">MIN</span></div>
-            <div class="step-body">
-              <div class="step-h">Pratique sur feux réels</div>
-              <div class="step-d">Extincteurs (eau pulvérisée, poudre, CO₂) et RIA · extinction réelle sur générateur écologique : <b>chaque participant manipule</b>.</div>
-            </div>
-          </div>
-          <div class="step">
-            <div class="step-time"><span class="min">10</span><span class="lbl">MIN</span></div>
-            <div class="step-body">
-              <div class="step-h">Débriefing &amp; validation</div>
-              <div class="step-d">Reprise individualisée des gestes · évaluation comportementale · signature du registre · remise des attestations.</div>
-            </div>
-          </div>
-        </div>
-        <div class="method-note">Pédagogie active — 80 % de pratique · Méthode C.A.D.R : Cadrage · Animation · Débriefing · Rapport</div>
+    <div class="orga">
+      <div class="h bebas">PLUSIEURS GROUPES ?<br/>JOURNÉE TYPE</div>
+      <div class="grid">
+        <div class="slot" style="left:0;"><div class="t">08h30</div><div class="s bebas">S1</div></div>
+        <div class="slot" style="left:68px;"><div class="t">10h15</div><div class="s bebas">S2</div></div>
+        <div class="slot" style="left:136px;"><div class="t">13h30</div><div class="s bebas">S3</div></div>
+        <div class="slot" style="left:204px;"><div class="t">15h15</div><div class="s bebas">S4</div></div>
       </div>
-
-      <!-- RIGHT -->
-      <div class="col-right">
-        <div class="sec-title">CADRE RÉGLEMENTAIRE</div>
-        <div class="reg">
-          <b>Code du travail, art. R.4227-28 &amp; R.4227-39 :</b> l'employeur doit fournir des moyens de lutte contre l'incendie et organiser, <b>au moins tous les 6 mois</b>, des exercices et essais périodiques. Le personnel doit être entraîné à manipuler extincteurs et RIA.
-        </div>
-
-        <div class="content-block">
-          <div class="sec-title">CONTENU</div>
-          <div class="cb-h">Apports théoriques</div>
-          <ul class="cb">
-            <li>Consignes et plans de sécurité en place</li>
-            <li>Triangle du feu : combustible, comburant, énergie</li>
-            <li>Classes de feux &amp; pictogrammes</li>
-            <li>Agents extincteurs et procédés d'extinction</li>
-          </ul>
-          <div class="cb-h prat">Mise en pratique</div>
-          <ul class="cb prat">
-            <li>Extincteurs du site : eau, poudre, CO₂</li>
-            <li>Présentation et utilisation du RIA</li>
-            <li>Extinction réelle encadrée individuellement</li>
-            <li>Générateur « feux propres » — sans fumée, usage intérieur</li>
-          </ul>
-        </div>
-
-        <div class="orga">
-          <div class="orga-h">PLUSIEURS GROUPES ? JOURNÉE TYPE</div>
-          <div class="orga-grid">
-            <div class="slot"><div class="t">08h30</div><div class="s">S1</div></div>
-            <div class="slot"><div class="t">10h15</div><div class="s">S2</div></div>
-            <div class="slot"><div class="t">13h30</div><div class="s">S3</div></div>
-            <div class="slot"><div class="t">15h15</div><div class="s">S4</div></div>
-          </div>
-          <div class="orga-tot">Jusqu'à <b>32 personnes formées / jour</b> et par formateur. Sessions organisables par entité (Cousin Trestec / Cousin Composites).</div>
-        </div>
-      </div>
+      <div class="tot">Jusqu'à <b>32 personnes / jour</b> et par formateur. Organisable par entité (Trestec / Composites).</div>
+      <div class="fin">Financement : prise en charge <b>OPCO</b> possible — organisme certifié Qualiopi.</div>
     </div>
 
-    <!-- FOOTER -->
+    <!-- footer -->
     <div class="footer">
-      <div class="f-name">ANDRAGOPS ACADÉMIE</div>
+      <div class="f-name bebas">ANDRAGOPS ACADÉMIE</div>
       <div class="f-role">Damien Lemort — Formateur SST INRS / Formateur de formateurs</div>
       <div class="f-contact">07 59 73 82 72 · info@andragops-academie.fr · www.andragops-academie.fr</div>
-      <div class="f-badges">Organisme certifié <span>Qualiopi</span> · Référent handicap dédié · Devis personnalisé sous 48 h · Document non contractuel</div>
+      <div class="f-badges">Organisme certifié <span>Qualiopi</span> · Référent handicap dédié · Devis sous 48 h · Document non contractuel</div>
     </div>
-
   </div>
 </body>
 </html>'''
 
 HTML = HTML.replace('__LOGO__', logo)
 open('/home/user/code-rouge/fiche_incendie_onepager.html', 'w').write(HTML)
+
+# Render preview PNG with weasyprint
+try:
+    from weasyprint import HTML as WHTML
+    WHTML(string=HTML).write_png('/home/user/code-rouge/fiche_preview.png', resolution=96)
+    print('rendered preview OK')
+except Exception as e:
+    print('render error:', e)
 print('written', len(HTML), 'chars')
