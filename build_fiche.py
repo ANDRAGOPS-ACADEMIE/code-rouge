@@ -1,4 +1,9 @@
-<!DOCTYPE html>
+# -*- coding: utf-8 -*-
+"""Construit la fiche incendie one-pager A4 avec logo intégré (data URI) et layout corrigé."""
+
+logo = open('/home/user/code-rouge/logo_tiny_datauri.txt').read().strip()
+
+HTML = r'''<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8" />
@@ -183,7 +188,7 @@
     <!-- HEADER -->
     <div class="header">
       <div class="header-left">
-        <img class="logo" src="data:image/png;base64,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" alt="ANDRAGOPS Académie" />
+        <img class="logo" src="__LOGO__" alt="ANDRAGOPS Académie" />
         <div class="header-tag">Santé, sécurité au travail &amp; secours d'urgence</div>
       </div>
       <div class="header-right">
@@ -303,4 +308,8 @@
 
   </div>
 </body>
-</html>
+</html>'''
+
+HTML = HTML.replace('__LOGO__', logo)
+open('/home/user/code-rouge/fiche_incendie_onepager.html', 'w').write(HTML)
+print('written', len(HTML), 'chars')
